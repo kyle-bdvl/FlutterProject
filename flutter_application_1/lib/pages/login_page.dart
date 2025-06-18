@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_grp_project/components/my_button.dart';
-import 'package:flutter_grp_project/components/my_textfield.dart';
-import 'package:flutter_grp_project/components/square_tile.dart';
-import 'package:flutter_grp_project/constants/route_names.dart';
+import 'package:flutter_application_1/widgets/my_button.dart';
+import 'package:flutter_application_1/widgets/my_textfield.dart';
+import 'package:flutter_application_1/widgets/square_tile.dart';
+import 'package:flutter_application_1/constants/route_names.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
