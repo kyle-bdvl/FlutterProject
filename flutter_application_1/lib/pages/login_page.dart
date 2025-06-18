@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/my_button.dart';
-import 'package:flutter_application_1/widgets/my_textfield.dart';
-import 'package:flutter_application_1/widgets/square_tile.dart';
+import 'package:flutter_grp_project/components/my_button.dart';
+import 'package:flutter_grp_project/components/my_textfield.dart';
+import 'package:flutter_grp_project/components/square_tile.dart';
+import 'package:flutter_grp_project/constants/route_names.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -25,20 +26,14 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 50),
 
               // logo
-              const Icon(
-                Icons.lock,
-                size: 100,
-              ),
+              const Icon(Icons.lock, size: 100),
 
               const SizedBox(height: 50),
 
               // welcome back, you've been missed!
               Text(
                 'Welcome back!',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
 
               const SizedBox(height: 25),
@@ -67,9 +62,17 @@ class LoginPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[600]),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, routeForgotPassword);
+                      },
+                      child: Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -78,9 +81,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               // sign in button
-              MyButton(
-                onTap: signUserIn,
-              ),
+              MyButton(text: 'Sign In', onTap: signUserIn),
 
               const SizedBox(height: 50),
 
@@ -90,10 +91,7 @@ class LoginPage extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -103,10 +101,7 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
                     ),
                   ],
                 ),
@@ -119,18 +114,18 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   // google button
-                  SquareTile(imagePath: 'lib/images/upm_logo.png')
+                  SquareTile(imagePath: 'lib/images/upm_logo.png'),
                 ],
               ),
 
               const SizedBox(height: 50),
 
-              // not a member? register now
+              // not register yet? register now
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Not a member?',
+                    'Not register yet?',
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
@@ -142,7 +137,7 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
