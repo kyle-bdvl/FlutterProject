@@ -68,10 +68,19 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Password has been reset successfully.'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Row(
+          children: const [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 10),
+            Text('Password reset successful.'),
+          ],
+        ),
+        backgroundColor: Colors.green[600],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        duration: const Duration(seconds: 1),
       ),
     );
 
