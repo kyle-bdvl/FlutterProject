@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/widgets/my_button.dart';
-import 'package:flutter_application_1/widgets/my_textfield.dart';
+import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/widgets/square_tile.dart';
+import 'RegisterPage.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -25,20 +26,14 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 50),
 
               // logo
-              const Icon(
-                Icons.lock,
-                size: 100,
-              ),
+              const Icon(Icons.lock, size: 100),
 
               const SizedBox(height: 50),
 
               // welcome back, you've been missed!
               Text(
                 'Welcome back!',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
 
               const SizedBox(height: 25),
@@ -78,9 +73,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               // sign in button
-              MyButton(
-                onTap: signUserIn,
-              ),
+              MyButton(onTap: signUserIn),
 
               const SizedBox(height: 50),
 
@@ -90,10 +83,7 @@ class LoginPage extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -103,10 +93,7 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
+                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
                     ),
                   ],
                 ),
@@ -119,7 +106,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   // google button
-                  SquareTile(imagePath: 'lib/images/google.png')
+                  SquareTile(imagePath: 'lib/images/google.png'),
                 ],
               ),
 
@@ -134,18 +121,54 @@ class LoginPage extends StatelessWidget {
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    'Register now',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  AnimatedRegisterText(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
+                        ),
+                      );
+                    },
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class AnimatedRegisterText extends StatefulWidget {
+  final VoidCallback onTap;
+  const AnimatedRegisterText({super.key, required this.onTap});
+
+  @override
+  State<AnimatedRegisterText> createState() => _AnimatedRegisterTextState();
+}
+
+class _AnimatedRegisterTextState extends State<AnimatedRegisterText> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedDefaultTextStyle(
+        duration: const Duration(milliseconds: 150),
+        style: TextStyle(
+          color: _pressed ? Colors.blue[900] : Colors.blue,
+          fontWeight: FontWeight.bold,
+          fontSize: _pressed ? 19 : 16,
+        ),
+        child: const Text('Register now'),
       ),
     );
   }
