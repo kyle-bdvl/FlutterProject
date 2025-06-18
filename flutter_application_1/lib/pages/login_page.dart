@@ -119,7 +119,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   // google button
-                  SquareTile(imagePath: 'lib/images/google.png')
+                  SquareTile(imagePath: 'lib/images/upm_logo.png')
                 ],
               ),
 
