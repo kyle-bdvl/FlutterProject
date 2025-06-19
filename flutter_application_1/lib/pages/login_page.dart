@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/widgets/my_button.dart';
-import 'package:flutter_application_1/widgets/my_textfield.dart';
+import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/widgets/square_tile.dart';
+
+import 'RegisterPage.dart';
+import 'AdminLoginPage.dart';
+import 'Dashboard.dart'; // <-- Add this import
+
 import 'package:flutter_application_1/constants/route_names.dart';
+
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -12,12 +18,51 @@ class LoginPage extends StatelessWidget {
   final passwordController = TextEditingController();
 
   // sign user in method
-  void signUserIn() {}
+  void signUserIn(BuildContext context) {
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    // Navigate to DashboardPage (use a placeholder image if needed)
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => DashboardPage(
+              username: username,
+              profileImagePath:
+                  'lib/images/default_profile.png', // Change as needed
+            ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings, color: Colors.blue),
+            tooltip: 'Admin Login',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminLoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -41,7 +86,7 @@ class LoginPage extends StatelessWidget {
               // username textfield
               MyTextField(
                 controller: usernameController,
-                hintText: 'Username',
+                hintText: 'Username or UPM-ID',
                 obscureText: false,
               ),
 
@@ -81,7 +126,9 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               // sign in button
-              MyButton(text: 'Sign In', onTap: signUserIn),
+
+              MyButton(onTap: () => signUserIn(context), text: "Sign In"),
+
 
               const SizedBox(height: 50),
 
@@ -114,7 +161,9 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   // google button
-                  SquareTile(imagePath: 'lib/images/upm_logo.png'),
+
+                  SquareTile(imagePath: 'lib/images/google.png'),
+
                 ],
               ),
 
@@ -125,22 +174,60 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Not register yet?',
+
+                    'Dont have an account?',
+
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    'Register now',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  AnimatedRegisterText(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class AnimatedRegisterText extends StatefulWidget {
+  final VoidCallback onTap;
+  const AnimatedRegisterText({super.key, required this.onTap});
+
+  @override
+  State<AnimatedRegisterText> createState() => _AnimatedRegisterTextState();
+}
+
+class _AnimatedRegisterTextState extends State<AnimatedRegisterText> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedDefaultTextStyle(
+        duration: const Duration(milliseconds: 150),
+        style: TextStyle(
+          color: _pressed ? Colors.blue[900] : Colors.blue,
+          fontWeight: FontWeight.bold,
+          fontSize: _pressed ? 19 : 16,
+        ),
+        child: const Text('Register now'),
       ),
     );
   }
