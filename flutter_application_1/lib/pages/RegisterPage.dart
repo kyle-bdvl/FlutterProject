@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/widgets/my_button.dart';
 import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/widgets/square_tile.dart';
+import 'dart:async';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -12,19 +13,75 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final usernameController = TextEditingController();
+  final upm_idController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   String userType = 'Recipient';
 
-  final List<String> userTypes = [
-    'System Administrator',
-    'Certificate Authority (CA)',
-    'Recipient',
-  ];
+  final List<String> userTypes = ['Certificate Authority (CA)', 'Recipient'];
 
-  void registerUser() {
-    // Registration logic here
-    // You can add validation and backend integration as needed
+  // Placeholder for checking username existence
+  Future<bool> usernameExists(String username) async {
+    // TODO: Replace with Firebase check later
+    await Future.delayed(const Duration(milliseconds: 200));
+    return false;
+  }
+
+  // Placeholder for checking UPM-ID existence
+  Future<bool> upmIdExists(String upmId) async {
+    // TODO: Replace with Firebase check later
+    await Future.delayed(const Duration(milliseconds: 200));
+    return false;
+  }
+
+  Future<void> registerUser() async {
+    final username = usernameController.text.trim();
+    final upmId = upm_idController.text.trim();
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
+
+    if (username.isEmpty ||
+        upmId.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    // Minimum password length check
+    if (password.length < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password must be at least 5 characters long'),
+        ),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+      return;
+    }
+
+    if (await usernameExists(username)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Username already exists')));
+      return;
+    }
+
+    if (await upmIdExists(upmId)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('UPM-ID already exists')));
+      return;
+    }
+
+    // Registration logic here (add Firebase logic later)
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('Registered as $userType')));
@@ -38,7 +95,8 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Center(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment:
+                  MainAxisAlignment.start, // <-- changed from center to start
               children: [
                 const SizedBox(height: 50),
                 const Icon(Icons.person_add, size: 100),
@@ -52,6 +110,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 MyTextField(
                   controller: usernameController,
                   hintText: 'Username',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 10),
+                // Matrics ID
+                MyTextField(
+                  controller: upm_idController,
+                  hintText: 'UPM-ID',
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
@@ -100,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                MyButton(onTap: registerUser),
+                MyButton(onTap: registerUser, text: "Register"),
                 const SizedBox(height: 25),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),

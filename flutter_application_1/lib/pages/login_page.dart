@@ -3,6 +3,8 @@ import 'package:flutter_application_1/widgets/my_button.dart';
 import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/widgets/square_tile.dart';
 import 'RegisterPage.dart';
+import 'AdminLoginPage.dart';
+import 'Dashboard.dart'; // <-- Add this import
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -12,12 +14,51 @@ class LoginPage extends StatelessWidget {
   final passwordController = TextEditingController();
 
   // sign user in method
-  void signUserIn() {}
+  void signUserIn(BuildContext context) {
+    final username = usernameController.text.trim();
+    final password = passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    // Navigate to DashboardPage (use a placeholder image if needed)
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => DashboardPage(
+              username: username,
+              profileImagePath:
+                  'lib/images/default_profile.png', // Change as needed
+            ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings, color: Colors.blue),
+            tooltip: 'Admin Login',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminLoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -41,7 +82,7 @@ class LoginPage extends StatelessWidget {
               // username textfield
               MyTextField(
                 controller: usernameController,
-                hintText: 'Username',
+                hintText: 'Username or UPM-ID',
                 obscureText: false,
               ),
 
@@ -73,7 +114,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               // sign in button
-              MyButton(onTap: signUserIn),
+              MyButton(onTap: () => signUserIn(context), text: "Sign In"),
 
               const SizedBox(height: 50),
 
@@ -117,7 +158,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Not a member?',
+                    'Dont have an account?',
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
