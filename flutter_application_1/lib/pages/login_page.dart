@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/widgets/my_button.dart';
 import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/widgets/square_tile.dart';
+
 import 'RegisterPage.dart';
 import 'AdminLoginPage.dart';
 import 'Dashboard.dart'; // <-- Add this import
+
+import 'package:flutter_application_1/constants/route_names.dart';
+
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -103,9 +107,17 @@ class LoginPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[600]),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, routeForgotPassword);
+                      },
+                      child: Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -114,7 +126,9 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               // sign in button
+
               MyButton(onTap: () => signUserIn(context), text: "Sign In"),
+
 
               const SizedBox(height: 50),
 
@@ -147,18 +161,22 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   // google button
+
                   SquareTile(imagePath: 'lib/images/google.png'),
+
                 ],
               ),
 
               const SizedBox(height: 50),
 
-              // not a member? register now
+              // not register yet? register now
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
+
                     'Dont have an account?',
+
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
