@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class CertificatePreviewPage extends StatelessWidget {
   final String recipientName;
@@ -22,70 +25,146 @@ class CertificatePreviewPage extends StatelessWidget {
   String formatDate(DateTime d) =>
       "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
 
+  Future<Uint8List> _generatePdf(final PdfPageFormat format) async {
+    final pdf = pw.Document();
+    final signatureImage = pw.MemoryImage(signatureBytes);
+
+    final borderColor = PdfColor.fromHex("#D4AF37"); // gold
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: format,
+        build: (context) {
+          return pw.Container(
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: borderColor, width: 6),
+            ),
+            padding: const pw.EdgeInsets.all(32),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                // Header
+                pw.Text(
+                  'UNIVERSITI PUTRA MALAYSIA',
+                  style: pw.TextStyle(
+                    fontSize: 22,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.brown800,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Divider(thickness: 1),
+                pw.SizedBox(height: 24),
+
+                // Title
+                pw.Text(
+                  'Certificate of Achievement',
+                  style: pw.TextStyle(
+                    fontSize: 30,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.black,
+                  ),
+                ),
+
+                pw.SizedBox(height: 32),
+
+                // Content
+                pw.Text(
+                  'This is to certify that',
+                  style: pw.TextStyle(fontSize: 18),
+                ),
+                pw.SizedBox(height: 12),
+                pw.Text(
+                  recipientName,
+                  style: pw.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.deepPurple,
+                  ),
+                ),
+                pw.SizedBox(height: 12),
+                pw.Text(
+                  'has successfully completed',
+                  style: pw.TextStyle(fontSize: 18),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  purpose,
+                  style: pw.TextStyle(
+                    fontSize: 16,
+                    fontStyle: pw.FontStyle.italic,
+                    color: PdfColors.grey800,
+                  ),
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.SizedBox(height: 12),
+                pw.Text('at $organization', style: pw.TextStyle(fontSize: 18)),
+
+                pw.Spacer(),
+
+                // Date section
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Column(
+                      children: [
+                        pw.Text('Issued on', style: pw.TextStyle(fontSize: 14)),
+                        pw.Text(
+                          formatDate(issued),
+                          style: pw.TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                    pw.Column(
+                      children: [
+                        pw.Text(
+                          'Expires on',
+                          style: pw.TextStyle(fontSize: 14),
+                        ),
+                        pw.Text(
+                          formatDate(expiry),
+                          style: pw.TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                pw.SizedBox(height: 24),
+
+                // Signature
+                pw.Container(height: 100, child: pw.Image(signatureImage)),
+                pw.Text(
+                  'Authorized Signature',
+                  style: pw.TextStyle(fontSize: 14),
+                ),
+
+                pw.SizedBox(height: 24),
+
+                // Footer
+                pw.Divider(thickness: 1),
+                pw.Text(
+                  'Generated via Digital Certificate System • Berilmu Berbakti',
+                  style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    return pdf.save();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Certificate Preview")),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Card(
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "Certificate of Achievement",
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  "This is to certify that",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  recipientName,
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text("has successfully completed"),
-                const SizedBox(height: 8),
-                Text(
-                  purpose,
-                  style: const TextStyle(fontStyle: FontStyle.italic),
-                ),
-                const SizedBox(height: 12),
-                Text("at $organization"),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [Text("Issued on"), Text(formatDate(issued))],
-                    ),
-                    Column(
-                      children: [Text("Expires on"), Text(formatDate(expiry))],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Image.memory(signatureBytes, height: 100),
-                const Text("Authorized Signature"),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context, true); // Return true when confirmed
-                  },
-                  child: const Text("Confirm & Save"),
-                ),
-              ],
-            ),
-          ),
-        ),
+      body: PdfPreview(
+        build: (format) => _generatePdf(format),
+        allowPrinting: true,
+        allowSharing: true,
       ),
     );
   }
