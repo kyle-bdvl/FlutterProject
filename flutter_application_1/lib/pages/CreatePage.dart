@@ -14,7 +14,14 @@ class CreatePage extends StatelessWidget {
             MaterialPageRoute(
               builder:
                   (context) => CertificateCreatePage(
-                    onDataSaved: (name, org, purpose, issued, expiry) {
+                    onDataSaved: (
+                      name,
+                      org,
+                      purpose,
+                      issued,
+                      expiry,
+                      signature,
+                    ) {
                       print("Certificate Created");
                     },
                   ),

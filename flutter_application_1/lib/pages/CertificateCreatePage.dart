@@ -1,7 +1,11 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'signaturePage.dart';
 
 class CertificateCreatePage extends StatefulWidget {
-  final Function(String, String, String, DateTime, DateTime) onDataSaved;
+  final Function(String, String, String, DateTime, DateTime, Uint8List)
+  onDataSaved;
+
   const CertificateCreatePage({Key? key, required this.onDataSaved})
     : super(key: key);
 
@@ -29,16 +33,34 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
     }
   }
 
-  void submit() {
+  Future<void> submit() async {
     if (_formKey.currentState!.validate()) {
-      widget.onDataSaved(
-        nameController.text,
-        orgController.text,
-        purposeController.text,
-        issued,
-        expiry,
+      final signatureBytes = await Navigator.push<Uint8List>(
+        context,
+        MaterialPageRoute(builder: (context) => const SignaturePage()),
       );
+
+      if (signatureBytes != null) {
+        widget.onDataSaved(
+          nameController.text,
+          orgController.text,
+          purposeController.text,
+          issued,
+          expiry,
+          signatureBytes,
+        );
+
+        // Optionally close this page after saving
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    orgController.dispose();
+    purposeController.dispose();
+    super.dispose();
   }
 
   @override
