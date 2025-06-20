@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'signaturePage.dart';
+import 'signaturePage.dart'; // Adjust import if needed
+import 'CertificatePreviewPage.dart'; // Your preview page
 
 class CertificateCreatePage extends StatefulWidget {
   final Function(String, String, String, DateTime, DateTime, Uint8List)
@@ -35,22 +36,48 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
 
   Future<void> submit() async {
     if (_formKey.currentState!.validate()) {
+      // Navigate to SignaturePage to get signature bytes
       final signatureBytes = await Navigator.push<Uint8List>(
         context,
         MaterialPageRoute(builder: (context) => const SignaturePage()),
       );
 
       if (signatureBytes != null) {
-        widget.onDataSaved(
-          nameController.text,
-          orgController.text,
-          purposeController.text,
-          issued,
-          expiry,
-          signatureBytes,
+        // Navigate to CertificatePreviewPage with all details and wait for confirmation
+        final result = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => CertificatePreviewPage(
+                  recipientName: nameController.text,
+                  organization: orgController.text,
+                  purpose: purposeController.text,
+                  issued: issued,
+                  expiry: expiry,
+                  signatureBytes: signatureBytes,
+                ),
+          ),
         );
 
-        // Optionally close this page after saving
+        if (result == true) {
+          // Call onDataSaved callback if user confirmed
+          widget.onDataSaved(
+            nameController.text,
+            orgController.text,
+            purposeController.text,
+            issued,
+            expiry,
+            signatureBytes,
+          );
+
+          // Close this page if needed
+          Navigator.pop(context);
+        }
+      } else {
+        // User didn't provide signature or canceled
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Signature not captured, try again")),
+        );
       }
     }
   }
