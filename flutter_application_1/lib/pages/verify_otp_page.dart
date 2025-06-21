@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/widgets/my_button.dart';
-import 'package:flutter_application_1/widgets/my_textfield.dart';
+import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/constants/route_names.dart';
 
 const String mockOtp = '12345';
