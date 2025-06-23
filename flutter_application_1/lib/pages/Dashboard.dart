@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'Profile.dart';
 import 'CreatePage.dart';
@@ -69,18 +72,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   // Notification logic here
                 },
               ),
+
               // CSV Upload Button
-              IconButton(
-                icon: const Icon(
-                  Icons.upload_file,
-                  size: 30,
-                  color: Colors.green,
-                ),
-                tooltip: 'Upload CSV',
-                onPressed: () async {
-                  // CSV upload logic here
-                },
-              ),
             ],
           ),
         ),
@@ -183,6 +176,72 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               );
             },
+          ),
+          const SizedBox(height: 10),
+          Center(
+            child: Column(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.upload_file,
+                    size: 30,
+                    color: Colors.green,
+                  ),
+                  tooltip: 'Upload CSV',
+                  onPressed: () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['csv'],
+                    );
+
+                    if (result != null && result.files.single.path != null) {
+                      final file = File(result.files.single.path!);
+                      final contents = await file.readAsString();
+
+                      final csvTable = const CsvToListConverter().convert(
+                        contents,
+                      );
+                      if (csvTable.isNotEmpty) {
+                        final headers = List<String>.from(
+                          csvTable[0].map((e) => e.toString()),
+                        );
+                        showDialog(
+                          context: context,
+                          builder:
+                              (context) => AlertDialog(
+                                title: const Text('CSV Headers (Metadata)'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children:
+                                      headers
+                                          .map((header) => Text('• $header'))
+                                          .toList(),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('CSV file is empty.')),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('No file selected.')),
+                      );
+                    }
+                  },
+                ),
+                Text("Upload CSV file"),
+              ],
+            ),
           ),
         ],
       ),

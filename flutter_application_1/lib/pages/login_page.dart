@@ -9,7 +9,6 @@ import 'Dashboard.dart'; // <-- Add this import
 
 import 'package:flutter_application_1/constants/route_names.dart';
 
-
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
@@ -126,9 +125,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               // sign in button
-
               MyButton(onTap: () => signUserIn(context), text: "Sign In"),
-
 
               const SizedBox(height: 50),
 
@@ -161,9 +158,7 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   // google button
-
                   SquareTile(imagePath: 'lib/images/google.png'),
-
                 ],
               ),
 
@@ -174,7 +169,6 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-
                     'Dont have an account?',
 
                     style: TextStyle(color: Colors.grey[700]),
