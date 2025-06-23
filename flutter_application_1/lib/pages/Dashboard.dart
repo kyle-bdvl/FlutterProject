@@ -21,14 +21,25 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
 
+  // Mock recent certificates data
+  final List<Map<String, String>> recentCertificates = [
+    {
+      'title': 'B.Sc. Computer Science',
+      'date': '2023-01-01',
+      'status': 'Verified',
+    },
+    {'title': 'M.Sc. Data Science', 'date': '2024-03-15', 'status': 'Pending'},
+    {'title': 'Diploma in AI', 'date': '2022-08-10', 'status': 'Verified'},
+  ];
+
   // Helper to build each page with the same navbar
   Widget _buildPage(Widget page, int selectedIndex) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
+        preferredSize: const Size.fromHeight(90),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           color: Colors.white,
           child: Row(
             children: [
@@ -56,6 +67,18 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
                 onPressed: () {
                   // Notification logic here
+                },
+              ),
+              // CSV Upload Button
+              IconButton(
+                icon: const Icon(
+                  Icons.upload_file,
+                  size: 30,
+                  color: Colors.green,
+                ),
+                tooltip: 'Upload CSV',
+                onPressed: () async {
+                  // CSV upload logic here
                 },
               ),
             ],
@@ -91,20 +114,87 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  Widget _dashboardHome() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Profile section
+          Center(
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 45,
+                  backgroundImage: AssetImage(widget.profileImagePath),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  widget.username,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  "Welcome back!",
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
+          const Text(
+            "Recent Certificates",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: recentCertificates.length,
+            itemBuilder: (context, index) {
+              final cert = recentCertificates[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  leading: Icon(
+                    cert['status'] == 'Verified'
+                        ? Icons.verified
+                        : Icons.hourglass_top,
+                    color:
+                        cert['status'] == 'Verified'
+                            ? Colors.green
+                            : Colors.orange,
+                  ),
+                  title: Text(cert['title'] ?? ''),
+                  subtitle: Text('Issued: ${cert['date']}'),
+                  trailing: Text(
+                    cert['status'] ?? '',
+                    style: TextStyle(
+                      color:
+                          cert['status'] == 'Verified'
+                              ? Colors.green
+                              : Colors.orange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Each index corresponds to a page
     switch (_selectedIndex) {
       case 0:
-        return _buildPage(
-          Center(
-            child: Text(
-              'Welcome to your Dashboard, ${widget.username}!',
-              style: const TextStyle(fontSize: 18),
-            ),
-          ),
-          0,
-        );
+        return _buildPage(_dashboardHome(), 0);
       case 1:
         return _buildPage(const ListPage(), 1);
       case 2:

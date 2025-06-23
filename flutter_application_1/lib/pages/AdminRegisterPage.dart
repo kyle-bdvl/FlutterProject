@@ -60,12 +60,13 @@ class _AdminRegisterPageState extends State<AdminRegisterPage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
+        toolbarHeight: kToolbarHeight + 20,
         title: const Text(
           'Admin Register',
           style: TextStyle(color: Colors.blue),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.white, // <-- Changed from Colors.transparent
+        elevation: 2, // <-- Adds a subtle shadow
         iconTheme: const IconThemeData(color: Colors.blue),
       ),
       body: SafeArea(

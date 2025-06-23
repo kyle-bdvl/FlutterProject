@@ -121,15 +121,41 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
                 validator: (val) => val!.isEmpty ? "Required" : null,
               ),
               ListTile(
-                title: Text("Issued: ${issued.toLocal()}".split(' ')[0]),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Issued Date"),
+                    Text(
+                      "${issued.toLocal()}".split(' ')[0],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => pickDate(true),
               ),
+
               ListTile(
-                title: Text("Expiry: ${expiry.toLocal()}".split(' ')[0]),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Expiry Date"),
+                    Text(
+                      "${expiry.toLocal()}".split(' ')[0],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => pickDate(false),
               ),
+
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: submit,

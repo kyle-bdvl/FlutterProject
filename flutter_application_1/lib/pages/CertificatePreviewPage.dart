@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class CertificatePreviewPage extends StatelessWidget {
   final String recipientName;
@@ -27,6 +28,9 @@ class CertificatePreviewPage extends StatelessWidget {
 
   Future<Uint8List> _generatePdf(final PdfPageFormat format) async {
     final pdf = pw.Document();
+
+    final ttf = pw.Font.ttf(await rootBundle.load('assets/fonts/times.ttf'));
+
     final signatureImage = pw.MemoryImage(signatureBytes);
 
     final borderColor = PdfColor.fromHex("#D4AF37"); // gold
@@ -47,6 +51,7 @@ class CertificatePreviewPage extends StatelessWidget {
                 pw.Text(
                   'UNIVERSITI PUTRA MALAYSIA',
                   style: pw.TextStyle(
+                    font: ttf,
                     fontSize: 22,
                     fontWeight: pw.FontWeight.bold,
                     color: PdfColors.brown800,
@@ -60,6 +65,7 @@ class CertificatePreviewPage extends StatelessWidget {
                 pw.Text(
                   'Certificate of Achievement',
                   style: pw.TextStyle(
+                    font: ttf,
                     fontSize: 30,
                     fontWeight: pw.FontWeight.bold,
                     color: PdfColors.black,
@@ -77,6 +83,7 @@ class CertificatePreviewPage extends StatelessWidget {
                 pw.Text(
                   recipientName,
                   style: pw.TextStyle(
+                    font: ttf,
                     fontSize: 24,
                     fontWeight: pw.FontWeight.bold,
                     color: PdfColors.deepPurple,
@@ -85,20 +92,25 @@ class CertificatePreviewPage extends StatelessWidget {
                 pw.SizedBox(height: 12),
                 pw.Text(
                   'has successfully completed',
-                  style: pw.TextStyle(fontSize: 18),
+                  style: pw.TextStyle(font: ttf, fontSize: 18),
                 ),
                 pw.SizedBox(height: 8),
                 pw.Text(
                   purpose,
                   style: pw.TextStyle(
+                    font: ttf,
                     fontSize: 16,
                     fontStyle: pw.FontStyle.italic,
                     color: PdfColors.grey800,
                   ),
                   textAlign: pw.TextAlign.center,
                 ),
+                pw.SizedBox(height: 8),
                 pw.SizedBox(height: 12),
-                pw.Text('at $organization', style: pw.TextStyle(fontSize: 18)),
+                pw.Text(
+                  'at $organization',
+                  style: pw.TextStyle(font: ttf, fontSize: 18),
+                ),
 
                 pw.Spacer(),
 
@@ -108,10 +120,13 @@ class CertificatePreviewPage extends StatelessWidget {
                   children: [
                     pw.Column(
                       children: [
-                        pw.Text('Issued on', style: pw.TextStyle(fontSize: 14)),
+                        pw.Text(
+                          'Issued on',
+                          style: pw.TextStyle(font: ttf, fontSize: 14),
+                        ),
                         pw.Text(
                           formatDate(issued),
-                          style: pw.TextStyle(fontSize: 14),
+                          style: pw.TextStyle(font: ttf, fontSize: 14),
                         ),
                       ],
                     ),
@@ -119,11 +134,11 @@ class CertificatePreviewPage extends StatelessWidget {
                       children: [
                         pw.Text(
                           'Expires on',
-                          style: pw.TextStyle(fontSize: 14),
+                          style: pw.TextStyle(font: ttf, fontSize: 14),
                         ),
                         pw.Text(
                           formatDate(expiry),
-                          style: pw.TextStyle(fontSize: 14),
+                          style: pw.TextStyle(font: ttf, fontSize: 14),
                         ),
                       ],
                     ),
@@ -136,7 +151,7 @@ class CertificatePreviewPage extends StatelessWidget {
                 pw.Container(height: 100, child: pw.Image(signatureImage)),
                 pw.Text(
                   'Authorized Signature',
-                  style: pw.TextStyle(fontSize: 14),
+                  style: pw.TextStyle(font: ttf, fontSize: 14),
                 ),
 
                 pw.SizedBox(height: 24),
@@ -145,7 +160,11 @@ class CertificatePreviewPage extends StatelessWidget {
                 pw.Divider(thickness: 1),
                 pw.Text(
                   'Generated via Digital Certificate System • Berilmu Berbakti',
-                  style: pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 10,
+                    color: PdfColors.grey600,
+                  ),
                 ),
               ],
             ),
