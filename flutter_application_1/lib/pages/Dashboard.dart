@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/CertificateListPreviewPage.dart';
+import 'package:flutter_application_1/pages/CertificatePreviewPage.dart';
+import 'package:flutter_application_1/pages/signaturePage.dart';
 import 'Profile.dart';
 import 'CreatePage.dart';
 import 'ListPage.dart';
@@ -198,35 +202,52 @@ class _DashboardPageState extends State<DashboardPage> {
                       final file = File(result.files.single.path!);
                       final contents = await file.readAsString();
 
-                      final csvTable = const CsvToListConverter().convert(
-                        contents,
-                      );
+                      final csvTable = const CsvToListConverter().convert(contents);
+
                       if (csvTable.isNotEmpty) {
-                        final headers = List<String>.from(
-                          csvTable[0].map((e) => e.toString()),
-                        );
-                        showDialog(
-                          context: context,
-                          builder:
-                              (context) => AlertDialog(
-                                title: const Text('CSV Headers (Metadata)'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children:
-                                      headers
-                                          .map((header) => Text('• $header'))
-                                          .toList(),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.of(context).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              ),
-                        );
+                        List<CertificateData> certs = [];
+                        for (int i = 1; i < csvTable.length; i++) {
+                          final row = csvTable[i];
+                          if (row.length < 5) continue; // Skip incomplete rows
+
+                          final name = row[0].toString();
+                          final org = row[1].toString();
+                          final purpose = row[2].toString();
+                          final issuedDate = DateTime.tryParse(row[3].toString()) ?? DateTime.now();
+                          final expiryDate = DateTime.tryParse(row[4].toString()) ?? DateTime.now().add(const Duration(days: 365));
+
+                          // Ask for signature for each certificate
+                          final signatureBytes = await Navigator.push<Uint8List>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignaturePage(),
+                            ),
+                          );
+
+                          if (signatureBytes == null) continue;
+
+                          certs.add(CertificateData(
+                            name: name,
+                            organization: org,
+                            purpose: purpose,
+                            issued: issuedDate,
+                            expiry: expiryDate,
+                            signatureBytes: signatureBytes,
+                          ));
+                        }
+
+                        if (certs.isNotEmpty) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CertificateListPreviewPage(certificates: certs),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No certificates to preview.')),
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('CSV file is empty.')),
