@@ -5,41 +5,82 @@ import 'package:flutter_application_1/widgets/square_tile.dart';
 
 import 'RegisterPage.dart';
 import 'AdminLoginPage.dart';
-import 'Dashboard.dart'; // <-- Add this import
+import 'Dashboard.dart';
+import 'AdminDashboard.dart';
 
 import 'package:flutter_application_1/constants/route_names.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   // text editing controllers
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  bool isLoading = false;
+
+  // Admin credentials (in a real app, these would be stored securely)
+  static const String ADMIN_UPM_ID = "admin123";
+  static const String ADMIN_PASSWORD = "admin@2024";
 
   // sign user in method
-  void signUserIn(BuildContext context) {
+  void signUserIn(BuildContext context) async {
     final username = usernameController.text.trim();
     final password = passwordController.text;
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
 
-    // Navigate to DashboardPage (use a placeholder image if needed)
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (context) => DashboardPage(
-              username: username,
-              profileImagePath:
-                  'lib/images/default_profile.png', // Change as needed
-            ),
-      ),
-    );
+    setState(() {
+      isLoading = true;
+    });
+
+    // Simulate API call delay
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Check if admin credentials
+    if (username == ADMIN_UPM_ID && password == ADMIN_PASSWORD) {
+      setState(() {
+        isLoading = false;
+      });
+
+      // Navigate to Admin Dashboard
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminDashboard()),
+        );
+      }
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+
+      // Navigate to normal user DashboardPage
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => DashboardPage(
+                  username: username,
+                  profileImagePath: 'lib/images/default_profile.png',
+                ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -125,9 +166,51 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
 
               // sign in button
-              MyButton(onTap: () => signUserIn(context), text: "Sign In"),
+              isLoading
+                  ? const CircularProgressIndicator()
+                  : MyButton(onTap: () => signUserIn(context), text: "Sign In"),
 
-              const SizedBox(height: 50),
+              const SizedBox(height: 25),
+
+              // Demo credentials info
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 25),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Demo Credentials:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Admin: UPM-ID: $ADMIN_UPM_ID, Password: $ADMIN_PASSWORD',
+                    ),
+                    const SizedBox(height: 4),
+                    const Text('User: Any other credentials'),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Note: Admin credentials will redirect to Admin Dashboard',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 25),
 
               // or continue with
               Padding(
@@ -170,7 +253,6 @@ class LoginPage extends StatelessWidget {
                 children: [
                   Text(
                     'Dont have an account?',
-
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
@@ -191,6 +273,13 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }
 
