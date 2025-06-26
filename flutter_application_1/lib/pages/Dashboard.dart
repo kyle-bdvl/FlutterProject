@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/CertificateListPreviewPage.dart';
 import 'package:flutter_application_1/pages/CertificatePreviewPage.dart';
 import 'package:flutter_application_1/pages/signaturePage.dart';
-import 'Profile.dart';
-import 'CreatePage.dart';
-import 'ListPage.dart';
-import 'SearchPage.dart';
+import 'package:flutter_application_1/pages/CreatePage.dart';
+import 'package:flutter_application_1/pages/ListPage.dart';
+import 'package:flutter_application_1/pages/Profile.dart';
+import 'package:flutter_application_1/pages/SearchPage.dart';
+import 'package:flutter_application_1/pages/TrueCopyApprovalPage.dart';
+import 'package:flutter_application_1/pages/AdminDashboard.dart';
 
 class DashboardPage extends StatefulWidget {
   final String username;
@@ -202,7 +204,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       final file = File(result.files.single.path!);
                       final contents = await file.readAsString();
 
-                      final csvTable = const CsvToListConverter().convert(contents);
+                      final csvTable = const CsvToListConverter().convert(
+                        contents,
+                      );
 
                       if (csvTable.isNotEmpty) {
                         List<CertificateData> certs = [];
@@ -213,39 +217,51 @@ class _DashboardPageState extends State<DashboardPage> {
                           final name = row[0].toString();
                           final org = row[1].toString();
                           final purpose = row[2].toString();
-                          final issuedDate = DateTime.tryParse(row[3].toString()) ?? DateTime.now();
-                          final expiryDate = DateTime.tryParse(row[4].toString()) ?? DateTime.now().add(const Duration(days: 365));
+                          final issuedDate =
+                              DateTime.tryParse(row[3].toString()) ??
+                              DateTime.now();
+                          final expiryDate =
+                              DateTime.tryParse(row[4].toString()) ??
+                              DateTime.now().add(const Duration(days: 365));
 
                           // Ask for signature for each certificate
-                          final signatureBytes = await Navigator.push<Uint8List>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignaturePage(),
-                            ),
-                          );
+                          final signatureBytes =
+                              await Navigator.push<Uint8List>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignaturePage(),
+                                ),
+                              );
 
                           if (signatureBytes == null) continue;
 
-                          certs.add(CertificateData(
-                            name: name,
-                            organization: org,
-                            purpose: purpose,
-                            issued: issuedDate,
-                            expiry: expiryDate,
-                            signatureBytes: signatureBytes,
-                          ));
+                          certs.add(
+                            CertificateData(
+                              name: name,
+                              organization: org,
+                              purpose: purpose,
+                              issued: issuedDate,
+                              expiry: expiryDate,
+                              signatureBytes: signatureBytes,
+                            ),
+                          );
                         }
 
                         if (certs.isNotEmpty) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => CertificateListPreviewPage(certificates: certs),
+                              builder:
+                                  (context) => CertificateListPreviewPage(
+                                    certificates: certs,
+                                  ),
                             ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('No certificates to preview.')),
+                            const SnackBar(
+                              content: Text('No certificates to preview.'),
+                            ),
                           );
                         }
                       } else {
