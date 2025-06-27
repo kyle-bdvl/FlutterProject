@@ -187,7 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
                 // google sign up button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     SquareTile(imagePath: 'lib/images/google.png'),
                   ],
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

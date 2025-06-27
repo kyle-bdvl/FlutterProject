@@ -164,14 +164,14 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     SquareTile(imagePath: 'lib/images/google.png'),
                   ],
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
