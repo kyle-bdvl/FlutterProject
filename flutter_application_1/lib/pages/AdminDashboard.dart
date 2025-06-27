@@ -84,7 +84,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             children: [
               Expanded(
                 child: _buildStatCard(
-                  'Pending',
+                  'Pending Documents',
                   pendingCount.toString(),
                   Colors.orange,
                   Icons.pending,
@@ -132,7 +132,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
               );
             },
-            text: 'Go to True Copy Approval',
+            text: 'True Copy Approval',
           ),
         ],
       ),
