@@ -1,3 +1,9 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
+import 'package:csv/csv.dart';
+import 'CertificateListPreviewPage.dart';
+import 'signaturePage.dart';
 import 'package:flutter/material.dart';
 import '../models/certificate.dart';
 import '../services/certificate_service.dart';
@@ -70,6 +76,7 @@ class _ListPageState extends State<ListPage> {
         title: const Text('My Certificates'),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false, // <-- Add this line
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -84,6 +91,108 @@ class _ListPageState extends State<ListPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Upload CSV Button
+              Center(
+                child: Column(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.upload_file,
+                        size: 30,
+                        color: Colors.green,
+                      ),
+                      tooltip: 'Upload CSV',
+                      onPressed: () async {
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['csv'],
+                        );
+
+                        if (result != null &&
+                            result.files.single.path != null) {
+                          final file = File(result.files.single.path!);
+                          final contents = await file.readAsString();
+
+                          final csvTable = const CsvToListConverter().convert(
+                            contents,
+                          );
+
+                          if (csvTable.isNotEmpty) {
+                            List<CertificateData> certs = [];
+                            for (int i = 1; i < csvTable.length; i++) {
+                              final row = csvTable[i];
+                              if (row.length < 5)
+                                continue; // Skip incomplete rows
+
+                              final name = row[0].toString();
+                              final org = row[1].toString();
+                              final purpose = row[2].toString();
+                              final issuedDate =
+                                  DateTime.tryParse(row[3].toString()) ??
+                                  DateTime.now();
+                              final expiryDate =
+                                  DateTime.tryParse(row[4].toString()) ??
+                                  DateTime.now().add(const Duration(days: 365));
+
+                              // Ask for signature for each certificate
+                              final signatureBytes =
+                                  await Navigator.push<Uint8List>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SignaturePage(),
+                                    ),
+                                  );
+
+                              if (signatureBytes == null) continue;
+
+                              certs.add(
+                                CertificateData(
+                                  name: name,
+                                  organization: org,
+                                  purpose: purpose,
+                                  issued: issuedDate,
+                                  expiry: expiryDate,
+                                  signatureBytes: signatureBytes,
+                                  createdBy: widget.username,
+                                ),
+                              );
+                            }
+
+                            if (certs.isNotEmpty) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => CertificateListPreviewPage(
+                                        certificates: certs,
+                                      ),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('No certificates to preview.'),
+                                ),
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('CSV file is empty.'),
+                              ),
+                            );
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No file selected.')),
+                          );
+                        }
+                      },
+                    ),
+                    const Text("Upload CSV file"),
+                  ],
+                ),
+              ),
               if (_isLoading)
                 const Center(
                   child: Padding(

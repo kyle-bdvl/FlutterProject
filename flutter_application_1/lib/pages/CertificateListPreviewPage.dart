@@ -10,6 +10,8 @@ class CertificateData {
   final DateTime expiry;
   final Uint8List signatureBytes;
   final String createdBy;
+  // Add this field if you want to track per-certificate
+  final bool fromCsv;
 
   CertificateData({
     required this.name,
@@ -19,6 +21,7 @@ class CertificateData {
     required this.expiry,
     required this.signatureBytes,
     required this.createdBy,
+    this.fromCsv = false,
   });
 }
 
@@ -89,6 +92,8 @@ class _CertificateListPreviewPageState
             expiry: cert.expiry,
             signatureBytes: cert.signatureBytes,
             createdBy: cert.createdBy,
+            fromCsv: true,
+            allCertificates: widget.certificates,
           );
         },
       ),
