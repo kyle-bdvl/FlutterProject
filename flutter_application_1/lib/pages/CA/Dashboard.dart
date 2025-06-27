@@ -3,12 +3,12 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/CertificateListPreviewPage.dart';
-import 'package:flutter_application_1/pages/signaturePage.dart';
-import 'package:flutter_application_1/pages/CreatePage.dart';
-import 'package:flutter_application_1/pages/ListPage.dart';
-import 'package:flutter_application_1/pages/Profile.dart';
-import 'package:flutter_application_1/pages/SearchPage.dart';
+import 'package:flutter_application_1/pages/CA/CertificateListPreviewPage.dart';
+import 'package:flutter_application_1/pages/CA/signaturePage.dart';
+import 'package:flutter_application_1/pages/CA/CreatePage.dart';
+import 'package:flutter_application_1/pages/CA/ListPage.dart';
+import 'package:flutter_application_1/pages/CA/Profile.dart';
+import 'package:flutter_application_1/pages/CA/SearchPage.dart';
 
 class DashboardPage extends StatefulWidget {
   final String username;
