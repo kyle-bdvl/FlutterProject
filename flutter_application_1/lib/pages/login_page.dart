@@ -3,10 +3,10 @@ import 'package:flutter_application_1/widgets/my_button.dart';
 import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/widgets/square_tile.dart';
 
-import 'RegisterPage.dart';
-import 'AdminLoginPage.dart';
-import 'Dashboard.dart';
-import 'AdminDashboard.dart';
+import 'Register/RegisterPage.dart';
+import 'Admin/AdminLoginPage.dart';
+import 'CA/Dashboard.dart';
+import 'Admin/AdminDashboard.dart';
 
 import 'package:flutter_application_1/constants/route_names.dart';
 

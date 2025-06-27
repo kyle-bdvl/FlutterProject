@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'signaturePage.dart'; // Adjust import if needed
 import 'CertificatePreviewPage.dart'; // Your preview page
-import '../services/certificate_service.dart';
+import '../../services/certificate_service.dart';
 
 class CertificateCreatePage extends StatefulWidget {
   final Function(String, String, String, DateTime, DateTime, Uint8List)
