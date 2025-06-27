@@ -1,12 +1,12 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/CertificateListPreviewPage.dart';
+import 'package:flutter_application_1/pages/CA/CertificateListPreviewPage.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import '../services/certificate_service.dart';
-import '../pages/share_certificate_page.dart';
+import '../../services/certificate_service.dart';
+import 'share_certificate_page.dart';
 
 class CertificatePreviewPage extends StatefulWidget {
   final String recipientName;
