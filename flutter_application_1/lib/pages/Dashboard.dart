@@ -4,14 +4,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/CertificateListPreviewPage.dart';
-import 'package:flutter_application_1/pages/CertificatePreviewPage.dart';
 import 'package:flutter_application_1/pages/signaturePage.dart';
 import 'package:flutter_application_1/pages/CreatePage.dart';
 import 'package:flutter_application_1/pages/ListPage.dart';
 import 'package:flutter_application_1/pages/Profile.dart';
 import 'package:flutter_application_1/pages/SearchPage.dart';
-import 'package:flutter_application_1/pages/TrueCopyApprovalPage.dart';
-import 'package:flutter_application_1/pages/AdminDashboard.dart';
 
 class DashboardPage extends StatefulWidget {
   final String username;
@@ -243,6 +240,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               issued: issuedDate,
                               expiry: expiryDate,
                               signatureBytes: signatureBytes,
+                              createdBy: widget.username,
                             ),
                           );
                         }
@@ -292,9 +290,9 @@ class _DashboardPageState extends State<DashboardPage> {
       case 0:
         return _buildPage(_dashboardHome(), 0);
       case 1:
-        return _buildPage(const ListPage(), 1);
+        return _buildPage(ListPage(username: widget.username), 1);
       case 2:
-        return _buildPage(const CreatePage(), 2);
+        return _buildPage(CreatePage(username: widget.username), 2);
       case 3:
         return _buildPage(const SearchPage(), 3);
       case 4:

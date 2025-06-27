@@ -4,14 +4,17 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import '../services/certificate_service.dart';
+import '../pages/share_certificate_page.dart';
 
-class CertificatePreviewPage extends StatelessWidget {
+class CertificatePreviewPage extends StatefulWidget {
   final String recipientName;
   final String organization;
   final String purpose;
   final DateTime issued;
   final DateTime expiry;
   final Uint8List signatureBytes;
+  final String createdBy;
 
   const CertificatePreviewPage({
     Key? key,
@@ -21,7 +24,34 @@ class CertificatePreviewPage extends StatelessWidget {
     required this.issued,
     required this.expiry,
     required this.signatureBytes,
+    required this.createdBy,
   }) : super(key: key);
+
+  @override
+  State<CertificatePreviewPage> createState() => _CertificatePreviewPageState();
+}
+
+class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
+  bool _isSaving = false;
+  bool _isAlreadySaved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfAlreadySaved();
+  }
+
+  void _checkIfAlreadySaved() {
+    final certificateService = CertificateService();
+    _isAlreadySaved = certificateService.isCertificateAlreadySaved(
+      recipientName: widget.recipientName,
+      organization: widget.organization,
+      purpose: widget.purpose,
+      issued: widget.issued,
+      expiry: widget.expiry,
+      createdBy: widget.createdBy,
+    );
+  }
 
   String formatDate(DateTime d) =>
       "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
@@ -31,7 +61,7 @@ class CertificatePreviewPage extends StatelessWidget {
 
     final ttf = pw.Font.ttf(await rootBundle.load('assets/fonts/times.ttf'));
 
-    final signatureImage = pw.MemoryImage(signatureBytes);
+    final signatureImage = pw.MemoryImage(widget.signatureBytes);
 
     final borderColor = PdfColor.fromHex("#D4AF37"); // gold
 
@@ -81,7 +111,7 @@ class CertificatePreviewPage extends StatelessWidget {
                 ),
                 pw.SizedBox(height: 12),
                 pw.Text(
-                  recipientName,
+                  widget.recipientName,
                   style: pw.TextStyle(
                     font: ttf,
                     fontSize: 24,
@@ -96,7 +126,7 @@ class CertificatePreviewPage extends StatelessWidget {
                 ),
                 pw.SizedBox(height: 8),
                 pw.Text(
-                  purpose,
+                  widget.purpose,
                   style: pw.TextStyle(
                     font: ttf,
                     fontSize: 16,
@@ -108,7 +138,7 @@ class CertificatePreviewPage extends StatelessWidget {
                 pw.SizedBox(height: 8),
                 pw.SizedBox(height: 12),
                 pw.Text(
-                  'at $organization',
+                  'at ${widget.organization}',
                   style: pw.TextStyle(font: ttf, fontSize: 18),
                 ),
 
@@ -125,7 +155,7 @@ class CertificatePreviewPage extends StatelessWidget {
                           style: pw.TextStyle(font: ttf, fontSize: 14),
                         ),
                         pw.Text(
-                          formatDate(issued),
+                          formatDate(widget.issued),
                           style: pw.TextStyle(font: ttf, fontSize: 14),
                         ),
                       ],
@@ -137,7 +167,7 @@ class CertificatePreviewPage extends StatelessWidget {
                           style: pw.TextStyle(font: ttf, fontSize: 14),
                         ),
                         pw.Text(
-                          formatDate(expiry),
+                          formatDate(widget.expiry),
                           style: pw.TextStyle(font: ttf, fontSize: 14),
                         ),
                       ],
@@ -176,14 +206,188 @@ class CertificatePreviewPage extends StatelessWidget {
     return pdf.save();
   }
 
+  Future<void> _saveCertificate() async {
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      final success = await CertificateService().saveCertificate(
+        recipientName: widget.recipientName,
+        organization: widget.organization,
+        purpose: widget.purpose,
+        issued: widget.issued,
+        expiry: widget.expiry,
+        signatureBytes: widget.signatureBytes,
+        createdBy: widget.createdBy,
+      );
+
+      if (success) {
+        setState(() {
+          _isAlreadySaved = true;
+        });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Certificate saved successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to download certificate page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => ShareCertificatePage(
+                  recipientName: widget.recipientName,
+                  organization: widget.organization,
+                  purpose: widget.purpose,
+                  issued: widget.issued,
+                  expiry: widget.expiry,
+                  signatureBytes: widget.signatureBytes,
+                  createdBy: widget.createdBy,
+                ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Certificate already saved. You can download it from your saved certificates.',
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error saving certificate: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSaving = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Certificate Preview")),
-      body: PdfPreview(
-        build: (format) => _generatePdf(format),
-        allowPrinting: true,
-        allowSharing: true,
+      body: Column(
+        children: [
+          // Info banner
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            color:
+                _isAlreadySaved ? Colors.orange.shade50 : Colors.blue.shade50,
+            child: Row(
+              children: [
+                Icon(
+                  _isAlreadySaved ? Icons.info_outline : Icons.info_outline,
+                  color: _isAlreadySaved ? Colors.orange : Colors.blue,
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _isAlreadySaved
+                        ? 'This certificate has already been saved. You can download it from your saved certificates.'
+                        : 'Review your certificate below. Click "Save Certificate" to proceed.',
+                    style: TextStyle(
+                      color:
+                          _isAlreadySaved
+                              ? Colors.orange.shade800
+                              : Colors.blue.shade800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // PDF Preview
+          Expanded(
+            child: PdfPreview(
+              build: (format) => _generatePdf(format),
+              allowPrinting: true,
+              allowSharing: true,
+            ),
+          ),
+          // Bottom save button - only show if not already saved
+          if (!_isAlreadySaved)
+            Container(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isSaving ? null : _saveCertificate,
+                  icon:
+                      _isSaving
+                          ? SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : Icon(Icons.save),
+                  label: Text(
+                    _isSaving ? 'Saving Certificate...' : 'Save Certificate',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          // Download button - only show if already saved
+          if (_isAlreadySaved)
+            Container(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ShareCertificatePage(
+                              recipientName: widget.recipientName,
+                              organization: widget.organization,
+                              purpose: widget.purpose,
+                              issued: widget.issued,
+                              expiry: widget.expiry,
+                              signatureBytes: widget.signatureBytes,
+                              createdBy: widget.createdBy,
+                            ),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.download),
+                  label: Text('Download Certificate'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

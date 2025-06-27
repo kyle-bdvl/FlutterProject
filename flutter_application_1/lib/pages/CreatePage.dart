@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'CertificateCreatePage.dart';
 
 class CreatePage extends StatelessWidget {
-  const CreatePage({super.key});
+  final String username;
+
+  const CreatePage({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class CreatePage extends StatelessWidget {
                     ) {
                       print("Certificate Created");
                     },
+                    username: username,
                   ),
             ),
           );

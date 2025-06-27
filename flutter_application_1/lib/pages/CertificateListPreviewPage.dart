@@ -9,6 +9,7 @@ class CertificateData {
   final DateTime issued;
   final DateTime expiry;
   final Uint8List signatureBytes;
+  final String createdBy;
 
   CertificateData({
     required this.name,
@@ -17,6 +18,7 @@ class CertificateData {
     required this.issued,
     required this.expiry,
     required this.signatureBytes,
+    required this.createdBy,
   });
 }
 
@@ -86,6 +88,7 @@ class _CertificateListPreviewPageState
             issued: cert.issued,
             expiry: cert.expiry,
             signatureBytes: cert.signatureBytes,
+            createdBy: cert.createdBy,
           );
         },
       ),
