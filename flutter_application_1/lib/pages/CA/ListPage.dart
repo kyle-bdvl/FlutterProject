@@ -5,8 +5,8 @@ import 'package:csv/csv.dart';
 import 'CertificateListPreviewPage.dart';
 import 'signaturePage.dart';
 import 'package:flutter/material.dart';
-import '../models/certificate.dart';
-import '../services/certificate_service.dart';
+import '../../models/certificate.dart';
+import '../../services/certificate_service.dart';
 import 'CertificatePreviewPage.dart';
 
 class ListPage extends StatefulWidget {

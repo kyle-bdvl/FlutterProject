@@ -52,13 +52,15 @@ class _ViewerAccessPageState extends State<ViewerAccessPage> {
                 if (tokenController.text == '123456') {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CertificateViewScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => CertificateViewScreen(),
+                    ),
                   );
                 } else {
                   // Show error message if wrong
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('❌ Access Denied')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('❌ Access Denied')));
                 }
               },
               child: Text('Access Certificate'),
