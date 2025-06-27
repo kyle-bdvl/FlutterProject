@@ -187,33 +187,35 @@ class _TrueCopyApprovalPageState extends State<TrueCopyApprovalPage> {
       builder:
           (context) => AlertDialog(
             title: Text(document.name),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDocumentInfo(document),
-                  const SizedBox(height: 16),
-                  PdfPreviewWidget(
-                    documentName: document.name,
-                    fileUrl: document.fileUrl,
-                    isApproved: document.status == 'Approved',
-                    issuer:
-                        document.issuer.isEmpty
-                            ? 'Not specified'
-                            : document.issuer,
-                    purpose: document.purpose,
-                    dateIssued:
-                        document.dateIssued.isEmpty
-                            ? 'Not specified'
-                            : document.dateIssued,
-                    status: document.status,
-                    approvedBy: document.approvedBy,
-                    approvedAt: document.approvedAt,
-                    rejectionReason: document.rejectionReason,
-                  ),
-                ],
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDocumentInfo(document),
+                    const SizedBox(height: 16),
+                    PdfPreviewWidget(
+                      documentName: document.name,
+                      fileUrl: document.fileUrl,
+                      isApproved: document.status == 'Approved',
+                      issuer:
+                          document.issuer.isEmpty
+                              ? 'Not specified'
+                              : document.issuer,
+                      purpose: document.purpose,
+                      dateIssued:
+                          document.dateIssued.isEmpty
+                              ? 'Not specified'
+                              : document.dateIssued,
+                      status: document.status,
+                      approvedBy: document.approvedBy,
+                      approvedAt: document.approvedAt,
+                      rejectionReason: document.rejectionReason,
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [
