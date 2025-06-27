@@ -14,58 +14,36 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   String errorText = '';
+  late String email;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    email = args['email'];
+  }
 
   void resetPassword() {
     final password = newPasswordController.text;
     final confirmPassword = confirmPasswordController.text;
 
-    // Validation checks
     if (password.isEmpty || confirmPassword.isEmpty) {
-      setState(() {
-        errorText = 'Please fill in both password fields.';
-      });
+      setState(() => errorText = 'Please fill in both password fields.');
       return;
     }
-
-    if (password.length < 8) {
-      setState(() {
-        errorText = 'Password must be at least 8 characters long.';
-      });
+    if (password.length < 8 ||
+        !RegExp(r'[A-Z]').hasMatch(password) ||
+        !RegExp(r'[a-z]').hasMatch(password) ||
+        !RegExp(r'[!@#\\$%^&*(),.?":{}|<>]').hasMatch(password)) {
+      setState(() => errorText = 'Password must meet all security criteria.');
       return;
     }
-
-    if (!RegExp(r'[A-Z]').hasMatch(password)) {
-      setState(() {
-        errorText = 'Password must contain an uppercase letter.';
-      });
-      return;
-    }
-
-    if (!RegExp(r'[a-z]').hasMatch(password)) {
-      setState(() {
-        errorText = 'Password must contain a lowercase letter.';
-      });
-      return;
-    }
-
-    if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password)) {
-      setState(() {
-        errorText = 'Password must include a special character.';
-      });
-      return;
-    }
-
     if (password != confirmPassword) {
-      setState(() {
-        errorText = 'Passwords do not match.';
-      });
+      setState(() => errorText = 'Passwords do not match.');
       return;
     }
 
-    // Success
-    setState(() {
-      errorText = ''; // Clear error
-    });
+    setState(() => errorText = '');
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -73,7 +51,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           children: const [
             Icon(Icons.check_circle, color: Colors.white),
             SizedBox(width: 10),
-            Text('Password reset successful.'),
+            Text('Password reset successful.')
           ],
         ),
         backgroundColor: Colors.green[600],
@@ -89,9 +67,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     });
   }
 
-  void goBackToLogin(BuildContext context) {
-    Navigator.pushReplacementNamed(context, routeLogin);
-  }
+  void goBackToLogin() => Navigator.pushReplacementNamed(context, routeLogin);
 
   @override
   void dispose() {
@@ -106,54 +82,75 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 25),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: ListView(
+              shrinkWrap: true,
               children: [
-                const SizedBox(height: 50),
+                const SizedBox(height: 60),
                 const Icon(Icons.lock_reset, size: 100),
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
                 Text(
-                  'Reset your password',
+                  'Resetting password for:',
                   style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 25),
-                MyTextField(
-                  controller: newPasswordController,
-                  hintText: 'New Password',
-                  obscureText: true,
+                const SizedBox(height: 5),
+                Text(
+                  email,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 10),
-                MyTextField(
-                  controller: confirmPasswordController,
-                  hintText: 'Confirm Password',
-                  obscureText: true,
-                ),
-                if (errorText.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Text(
-                      errorText,
-                      style: const TextStyle(color: Colors.red),
+                const SizedBox(height: 30),
+
+                // Narrower container for fields and button
+                Center(
+                  child: SizedBox(
+                    width: 320,
+                    child: Column(
+                      children: [
+                        MyTextField(
+                          controller: newPasswordController,
+                          hintText: 'New Password',
+                          obscureText: true,
+                        ),
+                        const SizedBox(height: 10),
+                        MyTextField(
+                          controller: confirmPasswordController,
+                          hintText: 'Confirm Password',
+                          obscureText: true,
+                        ),
+                        if (errorText.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Text(
+                              errorText,
+                              style: const TextStyle(color: Colors.red),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        const SizedBox(height: 25),
+                        MyButton(
+                          text: 'Reset Password',
+                          onTap: resetPassword,
+                        ),
+                      ],
                     ),
                   ),
+                ),
+
                 const SizedBox(height: 25),
-                MyButton(text: 'Reset Password', onTap: resetPassword),
-
-                const SizedBox(height: 20),
-
                 GestureDetector(
-                  onTap: () => goBackToLogin(context),
+                  onTap: goBackToLogin,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.arrow_back,
-                        size: 16,
-                        color: Colors.blue,
-                      ),
-                      const SizedBox(width: 4),
+                    children: const [
+                      Icon(Icons.arrow_back, size: 16, color: Colors.blue),
+                      SizedBox(width: 4),
                       Text(
                         'Back to Login',
                         style: TextStyle(
@@ -164,6 +161,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 30),
               ],
             ),
           ),
