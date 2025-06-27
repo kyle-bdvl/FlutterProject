@@ -61,14 +61,39 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Approved':
+        return Colors.green;
+      case 'Rejected':
+        return Colors.red;
+      case 'Pending':
+        return Colors.orange;
+      case 'Missing Metadata':
+        return Colors.amber;
+      default:
+        return Colors.grey;
+    }
+  }
+
   Widget _buildOverviewSection() {
     final pendingCount =
-        documents.where((doc) => doc.status == 'Pending').length;
+        documents
+            .where(
+              (doc) =>
+                  doc.status == 'Pending' &&
+                  doc.issuer.isNotEmpty &&
+                  doc.dateIssued.isNotEmpty,
+            )
+            .length;
     final approvedCount =
         documents.where((doc) => doc.status == 'Approved').length;
     final rejectedCount =
         documents.where((doc) => doc.status == 'Rejected').length;
-    final missingMetadataCount = documentsWithMissingMetadata.length;
+    final missingMetadataCount =
+        documents
+            .where((doc) => doc.issuer.isEmpty || doc.dateIssued.isEmpty)
+            .length;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -333,7 +358,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : DefaultTabController(
-                length: 3,
+                length: 2,
                 child: Column(
                   children: [
                     Container(
@@ -342,11 +367,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         labelColor: Colors.blue,
                         unselectedLabelColor: Colors.grey,
                         indicatorColor: Colors.blue,
-                        tabs: [
-                          Tab(text: 'Overview'),
-                          Tab(text: 'Admin Logs'),
-                          Tab(text: 'Missing Metadata'),
-                        ],
+                        tabs: [Tab(text: 'Overview'), Tab(text: 'Admin Logs')],
                       ),
                     ),
                     Expanded(
@@ -355,9 +376,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           SingleChildScrollView(child: _buildOverviewSection()),
                           SingleChildScrollView(
                             child: _buildAdminLogsSection(),
-                          ),
-                          SingleChildScrollView(
-                            child: _buildMissingMetadataSection(),
                           ),
                         ],
                       ),

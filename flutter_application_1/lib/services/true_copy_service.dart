@@ -4,6 +4,7 @@ import '../models/true_copy_document.dart';
 class TrueCopyService {
   // Mock data for demonstration
   static final List<TrueCopyDocument> _mockDocuments = [
+    // Pending example
     TrueCopyDocument(
       id: '1',
       fileUrl: 'https://example.com/document1.pdf',
@@ -14,6 +15,7 @@ class TrueCopyService {
       status: 'Pending',
       uploadedAt: DateTime.now().subtract(const Duration(days: 2)),
     ),
+    // Approved example
     TrueCopyDocument(
       id: '2',
       fileUrl: 'https://example.com/document2.pdf',
@@ -26,46 +28,28 @@ class TrueCopyService {
       approvedBy: 'Admin User',
       approvedAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
+    // Rejected example
     TrueCopyDocument(
       id: '3',
       fileUrl: 'https://example.com/document3.pdf',
       name: 'Employment Certificate',
-      issuer: '', // Missing issuer
+      issuer: 'Sample Company Ltd.',
       purpose: 'Loan Application',
-      dateIssued: '', // Missing date
+      dateIssued: '2024-01-20',
       status: 'Rejected',
       uploadedAt: DateTime.now().subtract(const Duration(days: 1)),
       rejectionReason: 'Missing required metadata',
     ),
+    // Missing Metadata example
     TrueCopyDocument(
       id: '4',
       fileUrl: 'https://example.com/document4.pdf',
       name: 'Medical Certificate',
-      issuer: 'City General Hospital',
-      purpose: 'Insurance Claim',
-      dateIssued: '2024-01-20',
-      status: 'Pending',
-      uploadedAt: DateTime.now().subtract(const Duration(hours: 6)),
-    ),
-    TrueCopyDocument(
-      id: '5',
-      fileUrl: 'https://example.com/document5.pdf',
-      name: 'Police Clearance',
-      issuer: 'Local Police Station',
-      purpose: 'Security Clearance',
-      dateIssued: '2024-01-18',
-      status: 'Pending',
-      uploadedAt: DateTime.now().subtract(const Duration(hours: 12)),
-    ),
-    TrueCopyDocument(
-      id: '6',
-      fileUrl: 'https://example.com/document6.pdf',
-      name: 'Marriage Certificate',
       issuer: '', // Missing issuer
-      purpose: 'Visa Application',
+      purpose: 'Insurance Claim',
       dateIssued: '', // Missing date
-      status: 'Pending',
-      uploadedAt: DateTime.now().subtract(const Duration(hours: 2)),
+      status: 'Missing Metadata',
+      uploadedAt: DateTime.now().subtract(const Duration(hours: 6)),
     ),
   ];
 
