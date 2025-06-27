@@ -105,8 +105,9 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             children: [
               const SizedBox(height: 50),
 
@@ -118,6 +119,7 @@ class _LoginPageState extends State<LoginPage> {
               // welcome back, you've been missed!
               Text(
                 'Welcome back!',
+                textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
 
@@ -167,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
 
               // sign in button
               isLoading
-                  ? const CircularProgressIndicator()
+                  ? const Center(child: CircularProgressIndicator())
                   : MyButton(onTap: () => signUserIn(context), text: "Sign In"),
 
               const SizedBox(height: 25),
@@ -210,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: 20),
 
               // or continue with
               Padding(
@@ -234,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
 
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
 
               // google + apple sign in buttons
               Row(
@@ -245,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
 
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
 
               // not register yet? register now
               Row(
@@ -268,6 +270,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
