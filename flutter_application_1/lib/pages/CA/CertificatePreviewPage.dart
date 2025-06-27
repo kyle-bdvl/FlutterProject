@@ -1,11 +1,12 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/CA/CertificateListPreviewPage.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import '../services/certificate_service.dart';
-import '../pages/share_certificate_page.dart';
+import '../../services/certificate_service.dart';
+import 'share_certificate_page.dart';
 
 class CertificatePreviewPage extends StatefulWidget {
   final String recipientName;
@@ -15,6 +16,8 @@ class CertificatePreviewPage extends StatefulWidget {
   final DateTime expiry;
   final Uint8List signatureBytes;
   final String createdBy;
+  final bool fromCsv;
+  final List<CertificateData>? allCertificates; // For Save All
 
   const CertificatePreviewPage({
     Key? key,
@@ -25,6 +28,8 @@ class CertificatePreviewPage extends StatefulWidget {
     required this.expiry,
     required this.signatureBytes,
     required this.createdBy,
+    this.fromCsv = false,
+    this.allCertificates,
   }) : super(key: key);
 
   @override
@@ -384,6 +389,62 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                ),
+              ),
+            ),
+          // Save all button - only show if from CSV and certificates are available
+          if (widget.fromCsv && widget.allCertificates != null)
+            Container(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.save_alt),
+                  label: Text('Save All Certificates'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed:
+                      _isSaving
+                          ? null
+                          : () async {
+                            setState(() {
+                              _isSaving = true;
+                            });
+                            int savedCount = 0;
+                            for (final cert in widget.allCertificates!) {
+                              try {
+                                final success = await CertificateService()
+                                    .saveCertificate(
+                                      recipientName: cert.name,
+                                      organization: cert.organization,
+                                      purpose: cert.purpose,
+                                      issued: cert.issued,
+                                      expiry: cert.expiry,
+                                      signatureBytes: cert.signatureBytes,
+                                      createdBy: cert.createdBy,
+                                    );
+                                if (success) savedCount++;
+                              } catch (_) {}
+                            }
+                            setState(() {
+                              _isSaving = false;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Saved $savedCount of ${widget.allCertificates!.length} certificates!',
+                                ),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          },
                 ),
               ),
             ),

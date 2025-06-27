@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/true_copy_document.dart';
-import '../services/true_copy_service.dart';
-import '../widgets/my_button.dart';
-import 'TrueCopyApprovalPage.dart';
+import '../../models/true_copy_document.dart';
+import '../../services/true_copy_service.dart';
+import '../../widgets/my_button.dart';
+import '../TrueCopyApprovalPage.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});

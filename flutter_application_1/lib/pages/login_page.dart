@@ -3,10 +3,10 @@ import 'package:flutter_application_1/widgets/my_button.dart';
 import 'package:flutter_application_1/widgets/my_textfiled.dart';
 import 'package:flutter_application_1/widgets/square_tile.dart';
 
-import 'RegisterPage.dart';
-import 'AdminLoginPage.dart';
-import 'Dashboard.dart';
-import 'AdminDashboard.dart';
+import 'Register/RegisterPage.dart';
+import 'Admin/AdminLoginPage.dart';
+import 'CA/Dashboard.dart';
+import 'Admin/AdminDashboard.dart';
 
 import 'package:flutter_application_1/constants/route_names.dart';
 
@@ -105,173 +105,190 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: SafeArea(
         child: Center(
-          child: ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-            children: [
-              const SizedBox(height: 50),
-
-              // logo
-              const Icon(Icons.lock, size: 100),
-
-              const SizedBox(height: 50),
-
-              // welcome back, you've been missed!
-              Text(
-                'Welcome back!',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey[700], fontSize: 16),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 400, // Keeps the form compact on large screens
+                minHeight:
+                    MediaQuery.of(context).size.height *
+                    0.8, // Fills most of the screen
               ),
-
-              const SizedBox(height: 25),
-
-              // username textfield
-              MyTextField(
-                controller: usernameController,
-                hintText: 'Username or UPM-ID',
-                obscureText: false,
-              ),
-
-              const SizedBox(height: 10),
-
-              // password textfield
-              MyTextField(
-                controller: passwordController,
-                hintText: 'Password',
-                obscureText: true,
-              ),
-
-              const SizedBox(height: 10),
-
-              // forgot password?
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, routeForgotPassword);
-                      },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // sign in button
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : MyButton(onTap: () => signUserIn(context), text: "Sign In"),
-
-              const SizedBox(height: 25),
-
-              // Demo credentials info
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 25),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue[200]!),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Demo Credentials:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Admin: UPM-ID: $ADMIN_UPM_ID, Password: $ADMIN_PASSWORD',
-                    ),
-                    const SizedBox(height: 4),
-                    const Text('User: Any other credentials'),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Note: Admin credentials will redirect to Admin Dashboard',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // or continue with
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(thickness: 0.5, color: Colors.grey[400]),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // google + apple sign in buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  // google button
-                  SquareTile(imagePath: 'lib/images/google.png'),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // not register yet? register now
-              Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 50),
+
+                  // logo
+                  const Icon(Icons.lock, size: 100),
+
+                  const SizedBox(height: 50),
+
+                  // welcome back, you've been missed!
                   Text(
-                    'Dont have an account?',
-                    style: TextStyle(color: Colors.grey[700]),
+                    'Welcome back!',
+                    style: TextStyle(color: Colors.grey[700], fontSize: 16),
                   ),
-                  const SizedBox(width: 4),
-                  AnimatedRegisterText(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterPage(),
+
+                  const SizedBox(height: 25),
+
+                  // username textfield
+                  MyTextField(
+                    controller: usernameController,
+                    hintText: 'Username or UPM-ID',
+                    obscureText: false,
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // password textfield
+                  MyTextField(
+                    controller: passwordController,
+                    hintText: 'Password',
+                    obscureText: true,
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // forgot password?
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, routeForgotPassword);
+                          },
+                          child: Text(
+                            'Forgot Password?',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
                         ),
-                      );
-                    },
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // sign in button
+                  isLoading
+                      ? const CircularProgressIndicator()
+                      : MyButton(
+                        onTap: () => signUserIn(context),
+                        text: "Sign In",
+                      ),
+
+                  const SizedBox(height: 25),
+
+                  // Demo credentials info
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 25),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue[200]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Demo Credentials:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Admin: UPM-ID: $ADMIN_UPM_ID, Password: $ADMIN_PASSWORD',
+                        ),
+                        const SizedBox(height: 4),
+                        const Text('User: Any other credentials'),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Note: Admin credentials will redirect to Admin Dashboard',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // or continue with
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            thickness: 0.5,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(
+                            'Or continue with',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            thickness: 0.5,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 50),
+
+                  // google + apple sign in buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      // google button
+                      SquareTile(imagePath: 'lib/images/google.png'),
+                    ],
+                  ),
+
+                  const SizedBox(height: 50),
+
+                  // not register yet? register now
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Dont have an account?',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                      const SizedBox(width: 4),
+                      AnimatedRegisterText(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),
