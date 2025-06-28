@@ -33,16 +33,8 @@ class _DashboardPageState extends State<DashboardPage> {
       'date': '2023-01-01',
       'status': 'Verified',
     },
-    {
-      'title': 'M.Sc. Data Science',
-      'date': '2024-03-15',
-      'status': 'Pending'
-    },
-    {
-      'title': 'Diploma in AI',
-      'date': '2022-08-10',
-      'status': 'Verified'
-    },
+    {'title': 'M.Sc. Data Science', 'date': '2024-03-15', 'status': 'Pending'},
+    {'title': 'Diploma in AI', 'date': '2022-08-10', 'status': 'Verified'},
   ];
 
   Widget _buildPage(Widget page, int selectedIndex) {
@@ -60,14 +52,16 @@ class _DashboardPageState extends State<DashboardPage> {
                 backgroundImage: AssetImage(widget.profileImagePath),
               ),
               const SizedBox(width: 12),
-              Text(
-                widget.username,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  widget.username,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Spacer(),
               IconButton(
                 icon: const Icon(
                   Icons.notifications_none,
@@ -94,9 +88,18 @@ class _DashboardPageState extends State<DashboardPage> {
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_rounded), label: 'Certificates'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle, size: 35), label: 'Create'),
-          BottomNavigationBarItem(icon: Icon(Icons.verified_user), label: 'Status'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list_rounded),
+            label: 'Certificates',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle, size: 35),
+            label: 'Create',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.verified_user),
+            label: 'Status',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
@@ -125,12 +128,18 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ),
                 const SizedBox(height: 5),
-                const Text("Welcome back!", style: TextStyle(fontSize: 16, color: Colors.grey)),
+                const Text(
+                  "Welcome back!",
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 30),
-          const Text("Recent Certificates", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text(
+            "Recent Certificates",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 10),
           ListView.builder(
             shrinkWrap: true,
@@ -142,15 +151,23 @@ class _DashboardPageState extends State<DashboardPage> {
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 child: ListTile(
                   leading: Icon(
-                    cert['status'] == 'Verified' ? Icons.verified : Icons.hourglass_top,
-                    color: cert['status'] == 'Verified' ? Colors.green : Colors.orange,
+                    cert['status'] == 'Verified'
+                        ? Icons.verified
+                        : Icons.hourglass_top,
+                    color:
+                        cert['status'] == 'Verified'
+                            ? Colors.green
+                            : Colors.orange,
                   ),
                   title: Text(cert['title'] ?? ''),
                   subtitle: Text('Issued: ${cert['date']}'),
                   trailing: Text(
                     cert['status'] ?? '',
                     style: TextStyle(
-                      color: cert['status'] == 'Verified' ? Colors.green : Colors.orange,
+                      color:
+                          cert['status'] == 'Verified'
+                              ? Colors.green
+                              : Colors.orange,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -174,12 +191,15 @@ class _DashboardPageState extends State<DashboardPage> {
       case 2:
         return _buildPage(CreatePage(username: widget.username), 2);
       case 3:
-       return _buildPage(StatusPage(username: widget.username), 3);
- // NEW
+        return _buildPage(StatusPage(username: widget.username), 3);
+      // NEW
       case 4:
         return _buildPage(const Profile(), 4);
       default:
-        return _buildPage(Center(child: Text('Page not found')), _selectedIndex);
+        return _buildPage(
+          Center(child: Text('Page not found')),
+          _selectedIndex,
+        );
     }
   }
 }

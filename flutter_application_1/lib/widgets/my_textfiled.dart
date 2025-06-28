@@ -4,12 +4,14 @@ class MyTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final bool obscureText;
+  final ValueChanged<String>? onChanged; // <-- Add this line
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
     required this.obscureText,
+    this.onChanged, // <-- Add this line
   });
 
   @override
@@ -34,6 +36,7 @@ class _MyTextFieldState extends State<MyTextField> {
         child: TextField(
           controller: widget.controller,
           obscureText: widget.obscureText ? _obscureText : false,
+          onChanged: widget.onChanged, // <-- Add this line
           decoration: InputDecoration(
             enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
@@ -45,19 +48,20 @@ class _MyTextFieldState extends State<MyTextField> {
             filled: true,
             hintText: widget.hintText,
             hintStyle: TextStyle(color: Colors.grey[500]),
-            suffixIcon: widget.obscureText
-                ? IconButton(
-              icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
-                color: Colors.grey,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureText = !_obscureText;
-                });
-              },
-            )
-                : null,
+            suffixIcon:
+                widget.obscureText
+                    ? IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    )
+                    : null,
           ),
         ),
       ),
