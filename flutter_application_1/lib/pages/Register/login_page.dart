@@ -54,10 +54,11 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) => DashboardPage(
-                username: name,
-                profileImagePath: 'lib/images/default_profile.png',
-              ),
+              builder:
+                  (_) => DashboardPage(
+                    username: name,
+                    profileImagePath: 'lib/images/default_profile.png',
+                  ),
             ),
           );
         }
@@ -96,10 +97,13 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
       );
 
-      final authResult = await FirebaseAuth.instance.signInWithCredential(credential);
+      final authResult = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
       final uid = authResult.user!.uid;
 
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       String userType;
 
@@ -112,19 +116,23 @@ class _LoginPageState extends State<LoginPage> {
             return AlertDialog(
               title: const Text('Select User Type'),
               content: StatefulBuilder(
-                builder: (context, setState) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: ['Certificate Authority (CA)', 'Recipient'].map((type) {
-                    return RadioListTile(
-                      title: Text(type),
-                      value: type,
-                      groupValue: selectedType,
-                      onChanged: (value) {
-                        setState(() => selectedType = value!);
-                      },
-                    );
-                  }).toList(),
-                ),
+                builder:
+                    (context, setState) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children:
+                          ['Certificate Authority (CA)', 'Recipient'].map((
+                            type,
+                          ) {
+                            return RadioListTile(
+                              title: Text(type),
+                              value: type,
+                              groupValue: selectedType,
+                              onChanged: (value) {
+                                setState(() => selectedType = value!);
+                              },
+                            );
+                          }).toList(),
+                    ),
               ),
               actions: [
                 TextButton(
@@ -151,10 +159,11 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => DashboardPage(
-            username: googleUser.displayName ?? email.split('@')[0],
-            profileImagePath: 'lib/images/upm_logo.png',
-          ),
+          builder:
+              (_) => DashboardPage(
+                username: googleUser.displayName ?? email.split('@')[0],
+                profileImagePath: 'lib/images/upm_logo.png',
+              ),
         ),
       );
     } catch (e) {
@@ -165,7 +174,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -178,10 +189,11 @@ class _LoginPageState extends State<LoginPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.admin_panel_settings, color: Colors.blue),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminLoginPage()),
-            ),
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminLoginPage()),
+                ),
           ),
         ],
       ),
@@ -193,7 +205,10 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 50),
                 const Icon(Icons.lock, size: 100),
                 const SizedBox(height: 50),
-                Text('Welcome back!', style: TextStyle(color: Colors.grey[700], fontSize: 16)),
+                Text(
+                  'Welcome back!',
+                  style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                ),
                 const SizedBox(height: 25),
 
                 Padding(
@@ -223,7 +238,9 @@ class _LoginPageState extends State<LoginPage> {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
-                      onTap: () => Navigator.pushNamed(context, routeForgotPassword),
+                      onTap:
+                          () =>
+                              Navigator.pushNamed(context, routeForgotPassword),
                       child: Text(
                         'Forgot Password?',
                         style: TextStyle(
@@ -239,12 +256,13 @@ class _LoginPageState extends State<LoginPage> {
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: isLoading
-                      ? const CircularProgressIndicator()
-                      : MyButton(
-                    onTap: () => signUserIn(context),
-                    text: "Sign In",
-                  ),
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator()
+                          : MyButton(
+                            onTap: () => signUserIn(context),
+                            text: "Sign In",
+                          ),
                 ),
 
                 const SizedBox(height: 20),
@@ -253,12 +271,19 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: Row(
                     children: [
-                      Expanded(child: Divider(thickness: 0.5, color: Colors.grey[400])),
+                      Expanded(
+                        child: Divider(thickness: 0.5, color: Colors.grey[400]),
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text('Or continue with', style: TextStyle(color: Colors.grey[700])),
+                        child: Text(
+                          'Or continue with',
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
                       ),
-                      Expanded(child: Divider(thickness: 0.5, color: Colors.grey[400])),
+                      Expanded(
+                        child: Divider(thickness: 0.5, color: Colors.grey[400]),
+                      ),
                     ],
                   ),
                 ),
@@ -267,7 +292,10 @@ class _LoginPageState extends State<LoginPage> {
 
                 GestureDetector(
                   onTap: () => signInWithGoogleUPM(context),
-                  child: const SquareTile(imagePath: 'lib/images/upm_logo.png', size: 50),
+                  child: const SquareTile(
+                    imagePath: 'lib/images/upm_logo.png',
+                    size: 50,
+                  ),
                 ),
 
                 const SizedBox(height: 20),
@@ -275,16 +303,25 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't have an account?", style: TextStyle(color: Colors.grey[700])),
+                    Text(
+                      "Don't have an account?",
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
                     const SizedBox(width: 4),
                     GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RegisterPage()),
-                      ),
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RegisterPage(),
+                            ),
+                          ),
                       child: const Text(
                         "Register now",
-                        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],

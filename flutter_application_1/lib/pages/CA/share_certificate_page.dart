@@ -20,7 +20,7 @@ class ShareCertificatePage extends StatefulWidget {
   final String createdBy;
 
   const ShareCertificatePage({
-    Key? key,
+    super.key,
     required this.recipientName,
     required this.organization,
     required this.purpose,
@@ -28,7 +28,7 @@ class ShareCertificatePage extends StatefulWidget {
     required this.expiry,
     required this.signatureBytes,
     required this.createdBy,
-  }) : super(key: key);
+  });
 
   @override
   _ShareCertificatePageState createState() => _ShareCertificatePageState();

@@ -10,10 +10,10 @@ class CertificateCreatePage extends StatefulWidget {
   final String username; // Add username parameter
 
   const CertificateCreatePage({
-    Key? key,
+    super.key,
     required this.onDataSaved,
     required this.username,
-  }) : super(key: key);
+  });
 
   @override
   State<CertificateCreatePage> createState() => _CertificateCreatePageState();
@@ -73,7 +73,7 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
           );
 
           if (result == true) {
-            // Save certificate using the service
+            // Save certificate using the service (status will be 'pending')
             await _certificateService.createCertificate(
               recipientName: nameController.text,
               organization: orgController.text,

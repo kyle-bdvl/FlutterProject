@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 // Fake "Certificate Viewer" screen
 class CertificateViewScreen extends StatelessWidget {
+  const CertificateViewScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,6 +20,8 @@ class CertificateViewScreen extends StatelessWidget {
 
 // Viewer Access Screen UI
 class ViewerAccessPage extends StatefulWidget {
+  const ViewerAccessPage({super.key});
+
   @override
   _ViewerAccessPageState createState() => _ViewerAccessPageState();
 }

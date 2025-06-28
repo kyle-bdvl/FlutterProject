@@ -37,7 +37,7 @@ class CertificateListPreviewPage extends StatefulWidget {
 
 class _CertificateListPreviewPageState
     extends State<CertificateListPreviewPage> {
-  PageController _controller = PageController();
+  final PageController _controller = PageController();
   int _currentIndex = 0;
 
   @override
@@ -92,8 +92,6 @@ class _CertificateListPreviewPageState
             expiry: cert.expiry,
             signatureBytes: cert.signatureBytes,
             createdBy: cert.createdBy,
-            fromCsv: true,
-            allCertificates: widget.certificates,
           );
         },
       ),

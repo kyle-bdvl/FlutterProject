@@ -1,6 +1,10 @@
 import 'dart:typed_data';
 
 class Certificate {
+  static const String pending = 'pending';
+  static const String approved = 'approved';
+  static const String rejected = 'rejected';
+
   final String id;
   final String recipientName;
   final String organization;
@@ -25,7 +29,8 @@ class Certificate {
     required this.createdBy,
   });
 
-  Map<String, dynamic> toJson() {
+  // Change toMap/fromMap for Firestore compatibility
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'recipientName': recipientName,
@@ -40,20 +45,18 @@ class Certificate {
     };
   }
 
-  factory Certificate.fromJson(Map<String, dynamic> json) {
+  factory Certificate.fromMap(Map<String, dynamic> map) {
     return Certificate(
-      id: json['id'],
-      recipientName: json['recipientName'],
-      organization: json['organization'],
-      purpose: json['purpose'],
-      issued: DateTime.parse(json['issued']),
-      expiry: DateTime.parse(json['expiry']),
-      signatureBytes: Uint8List.fromList(
-        List<int>.from(json['signatureBytes']),
-      ),
-      status: json['status'] ?? 'pending',
-      createdAt: DateTime.parse(json['createdAt']),
-      createdBy: json['createdBy'],
+      id: map['id'],
+      recipientName: map['recipientName'],
+      organization: map['organization'],
+      purpose: map['purpose'],
+      issued: DateTime.parse(map['issued']),
+      expiry: DateTime.parse(map['expiry']),
+      signatureBytes: Uint8List.fromList(List<int>.from(map['signatureBytes'])),
+      status: map['status'] ?? Certificate.pending,
+      createdAt: DateTime.parse(map['createdAt']),
+      createdBy: map['createdBy'],
     );
   }
 }
