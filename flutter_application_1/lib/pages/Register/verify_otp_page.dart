@@ -1,63 +1,113 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/widgets/my_button.dart';
+import 'package:flutter_application_1/widgets/my_textfiled.dart';
+import 'package:flutter_application_1/constants/route_names.dart';
 
-class MyTextField extends StatefulWidget {
-  final TextEditingController controller;
-  final String hintText;
-  final bool obscureText;
+const String mockOtp = '12345';
 
-  const MyTextField({
-    super.key,
-    required this.controller,
-    required this.hintText,
-    required this.obscureText,
-  });
+class VerifyOtpPage extends StatefulWidget {
+  const VerifyOtpPage({super.key});
 
   @override
-  State<MyTextField> createState() => _MyTextFieldState();
+  State<VerifyOtpPage> createState() => _VerifyOtpPageState();
 }
 
-class _MyTextFieldState extends State<MyTextField> {
-  late bool _obscureText;
+class _VerifyOtpPageState extends State<VerifyOtpPage> {
+  final otpController = TextEditingController();
+  String errorText = '';
+  late String email;
 
   @override
-  void initState() {
-    super.initState();
-    _obscureText = widget.obscureText;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    email = args['email'];
+  }
+
+  void verifyOtp() {
+    if (otpController.text == mockOtp) {
+      Navigator.pushReplacementNamed(
+        context,
+        routeResetPassword,
+        arguments: {'email': email},
+      );
+    } else {
+      setState(() => errorText = 'Invalid OTP. Please try again.');
+    }
+  }
+
+  void goBackToLogin() =>
+      Navigator.pushReplacementNamed(context, routeLogin);
+
+  void goBackToForgotPassword() =>
+      Navigator.pushReplacementNamed(context, routeForgotPassword);
+
+  @override
+  void dispose() {
+    otpController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0), // consistent width
-      child: SizedBox(
-        width: double.infinity,
-        child: TextField(
-          controller: widget.controller,
-          obscureText: widget.obscureText ? _obscureText : false,
-          decoration: InputDecoration(
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey),
-            ),
-            fillColor: Colors.grey.shade200,
-            filled: true,
-            hintText: widget.hintText,
-            hintStyle: TextStyle(color: Colors.grey[500]),
-            suffixIcon: widget.obscureText
-                ? IconButton(
-              icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
-                color: Colors.grey,
+    return Scaffold(
+      backgroundColor: Colors.grey[300],
+      appBar: AppBar(
+        backgroundColor: Colors.grey[300],
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: goBackToForgotPassword,
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25.0),
+          child: ListView(
+            children: [
+              const SizedBox(height: 80),
+              const Icon(Icons.lock_open, size: 100),
+              const SizedBox(height: 40),
+              Text(
+                'Enter the OTP sent to $email',
+                style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                textAlign: TextAlign.center,
               ),
-              onPressed: () {
-                setState(() {
-                  _obscureText = !_obscureText;
-                });
-              },
-            )
-                : null,
+              const SizedBox(height: 25),
+              MyTextField(
+                controller: otpController,
+                hintText: 'Enter OTP',
+                obscureText: false,
+              ),
+              if (errorText.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    errorText,
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              const SizedBox(height: 25),
+              MyButton(text: 'Verify Code', onTap: verifyOtp),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: goBackToLogin,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.arrow_back, size: 16, color: Colors.blue),
+                    SizedBox(width: 4),
+                    Text(
+                      'Back to Login',
+                      style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),
