@@ -4,6 +4,8 @@ import '../../models/true_copy_document.dart';
 import '../../services/true_copy_service.dart';
 import '../../widgets/my_button.dart';
 import '../TrueCopyApprovalPage.dart';
+import '../../models/certificate.dart';
+import '../../services/certificate_service.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -74,6 +76,66 @@ class _AdminDashboardState extends State<AdminDashboard> {
       default:
         return Colors.grey;
     }
+  }
+
+  Widget _buildPendingCertificatesSection() {
+    return StreamBuilder<List<Certificate>>(
+      stream: CertificateService().getPendingCertificates(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData)
+          return const Center(child: CircularProgressIndicator());
+        final pendingCerts = snapshot.data!;
+        if (pendingCerts.isEmpty) {
+          return const Center(child: Text('No pending certificates.'));
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: pendingCerts.length,
+          itemBuilder: (context, index) {
+            final cert = pendingCerts[index];
+            return Card(
+              child: ListTile(
+                title: Text(cert.recipientName),
+                subtitle: Text(
+                  'Purpose: ${cert.purpose}\nOrganization: ${cert.organization}',
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.check, color: Colors.green),
+                      tooltip: 'Approve',
+                      onPressed: () async {
+                        await CertificateService().approveCertificate(cert.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Certificate approved!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      tooltip: 'Reject',
+                      onPressed: () async {
+                        await CertificateService().rejectCertificate(cert.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Certificate rejected!'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget _buildOverviewSection() {
@@ -149,6 +211,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ],
           ),
           const SizedBox(height: 24),
+          const Text(
+            'Pending Certificates',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          _buildPendingCertificatesSection(),
           MyButton(
             onTap: () {
               Navigator.of(context).push(
@@ -290,8 +358,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   final document = documentsWithMissingMetadata[index];
                   final missingFields = <String>[];
                   if (document.issuer.isEmpty) missingFields.add('Issuer');
-                  if (document.dateIssued.isEmpty)
+                  if (document.dateIssued.isEmpty) {
                     missingFields.add('Date Issued');
+                  }
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: 8),

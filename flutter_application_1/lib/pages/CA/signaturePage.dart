@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 
 class SignaturePage extends StatefulWidget {
-  const SignaturePage({Key? key}) : super(key: key);
+  const SignaturePage({super.key});
 
   @override
   State<SignaturePage> createState() => _SignaturePageState();
