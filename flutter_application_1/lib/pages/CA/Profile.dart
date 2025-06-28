@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   final String? username;
   final String? profileImagePath;
   final int certificatesCount;
@@ -15,6 +17,37 @@ class Profile extends StatelessWidget {
     this.verifiedCount = 0,
     this.pendingCount = 0,
   });
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  String? username;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.username != null) {
+      username = widget.username;
+    } else {
+      _fetchUsername();
+    }
+  }
+
+  Future<void> _fetchUsername() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+      setState(() {
+        username = doc['username'] ?? 'User';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +67,8 @@ class Profile extends StatelessWidget {
             CircleAvatar(
               radius: 50,
               backgroundImage:
-                  profileImagePath != null
-                      ? AssetImage(profileImagePath!)
+                  widget.profileImagePath != null
+                      ? AssetImage(widget.profileImagePath!)
                       : const AssetImage('lib/images/default_profile.png'),
               backgroundColor: Colors.grey[200],
             ),
@@ -67,19 +100,19 @@ class Profile extends StatelessWidget {
                   children: [
                     _buildStat(
                       "Certificates",
-                      certificatesCount,
+                      widget.certificatesCount,
                       Icons.description,
                       Colors.blue,
                     ),
                     _buildStat(
                       "Verified",
-                      verifiedCount,
+                      widget.verifiedCount,
                       Icons.verified,
                       Colors.green,
                     ),
                     _buildStat(
                       "Pending",
-                      pendingCount,
+                      widget.pendingCount,
                       Icons.hourglass_top,
                       Colors.orange,
                     ),
@@ -109,9 +142,13 @@ class Profile extends StatelessWidget {
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                // Implement logout logic
-                Navigator.of(context).popUntil((route) => route.isFirst);
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                if (mounted) {
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/login', (route) => false);
+                }
               },
             ),
           ],
