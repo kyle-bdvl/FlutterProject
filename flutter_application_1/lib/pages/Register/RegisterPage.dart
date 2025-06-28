@@ -14,7 +14,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final usernameController = TextEditingController();
-  final upmIdController = TextEditingController();
+  final emailOrUpmIdController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   String userType = 'Recipient';
@@ -24,14 +24,30 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> registerUser() async {
     final username = usernameController.text.trim();
-    final upmId = upmIdController.text.trim();
+    final emailOrUpmId = emailOrUpmIdController.text.trim();
     final password = passwordController.text;
     final confirmPassword = confirmPasswordController.text;
-    final email = '$upmId@student.upm.edu.my';
 
-    if ([username, upmId, password, confirmPassword].any((e) => e.isEmpty)) {
+    if ([username, emailOrUpmId, password, confirmPassword].any((e) => e.isEmpty)) {
       showMessage('Please fill in all fields');
       return;
+    }
+
+    // Determine if input is UPM-ID or email
+    String email;
+    String upmId = '';
+    if (RegExp(r'^[a-zA-Z0-9.]+$').hasMatch(emailOrUpmId) && !emailOrUpmId.contains('@')) {
+      // Looks like a UPM-ID
+      upmId = emailOrUpmId;
+      email = '$upmId@student.upm.edu.my';
+    } else {
+      // Looks like an email
+      email = emailOrUpmId;
+      // Basic email format validation
+      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+        showMessage('Please enter a valid email address');
+        return;
+      }
     }
 
     if (password.length < 8 ||
@@ -62,6 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
             'username': username,
             'upmId': upmId,
             'email': email,
+            'originalInput': emailOrUpmId,
             'userType': userType,
             'createdAt': FieldValue.serverTimestamp(),
           });
@@ -70,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
-        showMessage('UPM-ID is already registered');
+        showMessage('This email is already registered');
       } else {
         showMessage(e.message ?? 'Registration failed');
       }
@@ -127,9 +144,18 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         const SizedBox(height: 10),
                         MyTextField(
-                          controller: upmIdController,
-                          hintText: 'UPM-ID',
+                          controller: emailOrUpmIdController,
+                          hintText: 'UPM-ID or Email',
                           obscureText: false,
+                          onChanged: (value) {
+                            final trimmed = value.trim();
+                            if (value != trimmed) {
+                              emailOrUpmIdController.value = emailOrUpmIdController.value.copyWith(
+                                text: trimmed,
+                                selection: TextSelection.collapsed(offset: trimmed.length),
+                              );
+                            }
+                          },
                         ),
                         const SizedBox(height: 10),
                         MyTextField(
@@ -144,7 +170,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscureText: true,
                         ),
                         const SizedBox(height: 10),
-
                         SizedBox(
                           height: 60,
                           child: DropdownButtonFormField<String>(
@@ -172,31 +197,25 @@ class _RegisterPageState extends State<RegisterPage> {
                               206,
                               255,
                             ),
-                            items:
-                                userTypes
-                                    .map(
-                                      (type) => DropdownMenuItem(
-                                        value: type,
-                                        child: Text(type),
-                                      ),
-                                    )
-                                    .toList(),
-                            onChanged:
-                                (value) => setState(() => userType = value!),
+                            items: userTypes
+                                .map(
+                                  (type) => DropdownMenuItem(
+                                    value: type,
+                                    child: Text(type),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) => setState(() => userType = value!),
                           ),
                         ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 25),
-
                   isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : MyButton(onTap: registerUser, text: "Register"),
-
                   const SizedBox(height: 20),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -230,7 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void dispose() {
     usernameController.dispose();
-    upmIdController.dispose();
+    emailOrUpmIdController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
