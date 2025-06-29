@@ -234,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 10),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(

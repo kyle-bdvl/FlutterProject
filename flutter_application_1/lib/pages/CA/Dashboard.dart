@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/pages/Register/login_page.dart';
 import 'package:flutter_application_1/pages/CA/CreatePage.dart';
 import 'package:flutter_application_1/pages/CA/Profile.dart';
 import 'package:flutter_application_1/pages/CA/status_page.dart';
@@ -51,6 +53,34 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _confirmAndSignOut() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Logout'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout == true) {
+      await FirebaseAuth.instance.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final horizontalPadding = MediaQuery.of(context).size.width * 0.05;
@@ -71,8 +101,6 @@ class _DashboardPageState extends State<DashboardPage> {
         break;
       case 0:
       default:
-      // Wrap the Home content in a scrollable sliver that fills
-      // remaining space and centers when short:
         body = CustomScrollView(
           slivers: [
             SliverFillRemaining(
@@ -86,6 +114,21 @@ class _DashboardPageState extends State<DashboardPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Recipient Dashboard label
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Text(
+                        'Recipient Dashboard',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
                     // Greeting card
                     Card(
                       shape: RoundedRectangleBorder(
@@ -121,6 +164,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
                     // Data-driven stats & recent certificates
@@ -156,15 +200,15 @@ class _DashboardPageState extends State<DashboardPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
                               children: [
                                 _buildStatCard(
                                     'Approved', approvedCount, Colors.green),
+                                const SizedBox(width: 8),
                                 _buildStatCard(
                                     'Pending', pendingCount, Colors.orange),
-                                _buildStatCard('Rejected',
-                                    rejectedCount, Colors.red),
+                                const SizedBox(width: 8),
+                                _buildStatCard(
+                                    'Rejected', rejectedCount, Colors.red),
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -193,8 +237,8 @@ class _DashboardPageState extends State<DashboardPage> {
                             const SizedBox(height: 20),
                             Center(
                               child: ElevatedButton(
-                                onPressed: () => setState(
-                                        () => _selectedIndex = 1),
+                                onPressed: () =>
+                                    setState(() => _selectedIndex = 1),
                                 child:
                                 const Text('View All Certificates'),
                               ),
@@ -212,7 +256,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -241,13 +285,10 @@ class _DashboardPageState extends State<DashboardPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              // Logout with confirmation
               IconButton(
-                icon: const Icon(
-                  Icons.notifications_none,
-                  size: 30,
-                  color: Colors.blue,
-                ),
-                onPressed: () {},
+                icon: const Icon(Icons.logout, size: 30, color: Colors.blue),
+                onPressed: _confirmAndSignOut,
               ),
             ],
           ),
@@ -264,50 +305,46 @@ class _DashboardPageState extends State<DashboardPage> {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.home), label: 'Home'),
+              icon: Icon(Icons.list_rounded), label: 'Certificates'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.list_rounded),
-              label: 'Certificates'),
+              icon: Icon(Icons.add_circle, size: 35), label: 'Create'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle, size: 35),
-              label: 'Create'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.verified_user),
-              label: 'Status'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile'),
+              icon: Icon(Icons.verified_user), label: 'Status'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
   }
 
   Widget _buildStatCard(String label, int count, Color color) {
+    final bgColor = color.withOpacity(0.1);
     return Expanded(
-      child: Card(
-        color: color.withOpacity(0.1),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            children: [
-              Text('$count',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: color)),
-              const SizedBox(height: 4),
-              Text(label, style: TextStyle(color: color)),
-            ],
-          ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.4)),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          children: [
+            Text('$count',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color)),
+            const SizedBox(height: 4),
+            Text(label, style: TextStyle(color: color)),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildCertificateCard(Certificate cert) {
+    final statusColor = _getStatusColor(cert.status);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -330,9 +367,7 @@ class _DashboardPageState extends State<DashboardPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 4)
-          ],
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
         ),
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -340,7 +375,7 @@ class _DashboardPageState extends State<DashboardPage> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: _getStatusColor(cert.status),
+              backgroundColor: statusColor,
               child: _getStatusIcon(cert.status),
             ),
             const SizedBox(height: 8),
@@ -349,8 +384,8 @@ class _DashboardPageState extends State<DashboardPage> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold),
+              style:
+              const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
@@ -369,8 +404,7 @@ class _DashboardPageState extends State<DashboardPage> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
             const SizedBox(height: 6),
             Text(
@@ -379,7 +413,7 @@ class _DashboardPageState extends State<DashboardPage> {
               style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: _getStatusColor(cert.status)),
+                  color: statusColor),
             ),
             const SizedBox(height: 6),
             Text(
@@ -388,8 +422,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   .toIso8601String()
                   .split('T')[0],
               textAlign: TextAlign.center,
-              style:
-              const TextStyle(fontSize: 11, color: Colors.grey),
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
         ),
