@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
+import 'package:share_plus/share_plus.dart';
 
 // This screen lets the user download their saved certificate
 class ShareCertificatePage extends StatefulWidget {
@@ -394,6 +395,42 @@ class _ShareCertificatePageState extends State<ShareCertificatePage> {
                 label: Text('Print Certificate'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 16),
+
+            // Share button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final pdfBytes = await _generatePdf(PdfPageFormat.a4);
+
+                  // Save to a temporary file
+                  final tempDir = await getTemporaryDirectory();
+                  final timestamp = DateTime.now().millisecondsSinceEpoch;
+                  final filename =
+                      'Certificate_${widget.recipientName.replaceAll(' ', '_')}_$timestamp.pdf';
+                  final file = File('${tempDir.path}/$filename');
+                  await file.writeAsBytes(pdfBytes);
+
+                  // Share the PDF file
+                  await Share.shareXFiles([
+                    XFile(file.path),
+                  ], text: 'Here is my certificate!');
+                },
+                icon: Icon(Icons.share),
+                label: Text('Share Certificate'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
                   textStyle: TextStyle(
