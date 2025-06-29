@@ -15,6 +15,7 @@ class CertificatePreviewPage extends StatefulWidget {
   final DateTime expiry;
   final Uint8List signatureBytes;
   final String createdBy;
+  final bool fromListPage; // <-- Add this
 
   const CertificatePreviewPage({
     super.key,
@@ -25,6 +26,7 @@ class CertificatePreviewPage extends StatefulWidget {
     required this.expiry,
     required this.signatureBytes,
     required this.createdBy,
+    this.fromListPage = false, // <-- Default to false
   });
 
   @override
