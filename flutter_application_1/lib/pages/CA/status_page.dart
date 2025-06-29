@@ -1,5 +1,11 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter/material.dart';
 import '../../models/certificate.dart';
 import '../../services/certificate_service.dart';
 
@@ -71,15 +77,89 @@ class StatusPage extends StatelessWidget {
             if (statusColor == Colors.green)
               IconButton(
                 icon: const Icon(Icons.share, color: Colors.blue),
-                onPressed: () {
-                  Share.share(
-                    "Certificate: ${cert.recipientName}\nIssued on: ${cert.issued.toString().split(' ')[0]}\nStatus: Approved",
+                onPressed: () async {
+                  final pdfBytes = await _generatePdf(cert);
+                  final tempDir = await getTemporaryDirectory();
+                  final file = File(
+                    '${tempDir.path}/Certificate_${cert.recipientName.replaceAll(' ', '_')}.pdf',
                   );
+                  await file.writeAsBytes(pdfBytes);
+                  await Share.shareXFiles([
+                    XFile(file.path),
+                  ], text: 'Here is my approved certificate!');
                 },
               ),
           ],
         ),
       ),
     );
+  }
+
+  Future<Uint8List> _generatePdf(Certificate cert) async {
+    final pdf = pw.Document();
+    final ttf = pw.Font.ttf(await rootBundle.load('assets/fonts/times.ttf'));
+    final signatureImage = pw.MemoryImage(cert.signatureBytes);
+    final borderColor = PdfColor.fromHex("#D4AF37");
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (context) {
+          return pw.Container(
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: borderColor, width: 6),
+            ),
+            padding: const pw.EdgeInsets.all(32),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'UNIVERSITI PUTRA MALAYSIA',
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 22,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.brown800,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Divider(thickness: 1),
+                pw.SizedBox(height: 24),
+                pw.Text(
+                  cert.recipientName,
+                  style: pw.TextStyle(font: ttf, fontSize: 20),
+                ),
+                pw.SizedBox(height: 12),
+                pw.Text(
+                  cert.organization,
+                  style: pw.TextStyle(font: ttf, fontSize: 16),
+                ),
+                pw.SizedBox(height: 12),
+                pw.Text(
+                  cert.purpose,
+                  style: pw.TextStyle(font: ttf, fontSize: 16),
+                ),
+                pw.SizedBox(height: 12),
+                pw.Text(
+                  "Issued: ${cert.issued.toString().split(' ')[0]}",
+                  style: pw.TextStyle(font: ttf, fontSize: 14),
+                ),
+                pw.Text(
+                  "Expiry: ${cert.expiry.toString().split(' ')[0]}",
+                  style: pw.TextStyle(font: ttf, fontSize: 14),
+                ),
+                pw.SizedBox(height: 24),
+                pw.Image(signatureImage, width: 120, height: 60),
+                pw.Text(
+                  "Signature",
+                  style: pw.TextStyle(font: ttf, fontSize: 12),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+    return pdf.save();
   }
 }
