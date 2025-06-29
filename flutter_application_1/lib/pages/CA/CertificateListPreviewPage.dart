@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/services/certificate_service.dart';
 import 'CertificatePreviewPage.dart';
 
 class CertificateData {
@@ -39,6 +40,7 @@ class _CertificateListPreviewPageState
     extends State<CertificateListPreviewPage> {
   final PageController _controller = PageController();
   int _currentIndex = 0;
+  bool _isSavingAll = false; // Add to your state
 
   @override
   Widget build(BuildContext context) {
@@ -74,26 +76,98 @@ class _CertificateListPreviewPageState
           ),
         ],
       ),
-      body: PageView.builder(
-        controller: _controller,
-        itemCount: widget.certificates.length,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        itemBuilder: (context, index) {
-          final cert = widget.certificates[index];
-          return CertificatePreviewPage(
-            recipientName: cert.name,
-            organization: cert.organization,
-            purpose: cert.purpose,
-            issued: cert.issued,
-            expiry: cert.expiry,
-            signatureBytes: cert.signatureBytes,
-            createdBy: cert.createdBy,
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon:
+                    _isSavingAll
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : const Icon(Icons.save_alt),
+                label: Text(
+                  _isSavingAll ? 'Saving...' : 'Save All Certificates',
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed:
+                    _isSavingAll
+                        ? null
+                        : () async {
+                          setState(() {
+                            _isSavingAll = true;
+                          });
+                          int savedCount = 0;
+                          for (final cert in widget.certificates) {
+                            try {
+                              await CertificateService().createCertificate(
+                                recipientName: cert.name,
+                                organization: cert.organization,
+                                purpose: cert.purpose,
+                                issued: cert.issued,
+                                expiry: cert.expiry,
+                                signatureBytes: cert.signatureBytes,
+                                createdBy: cert.createdBy,
+                              );
+                              savedCount++;
+                            } catch (_) {}
+                          }
+                          setState(() {
+                            _isSavingAll = false;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Saved $savedCount of ${widget.certificates.length} certificates!',
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+              ),
+            ),
+          ),
+          Expanded(
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: widget.certificates.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                final cert = widget.certificates[index];
+                return CertificatePreviewPage(
+                  recipientName: cert.name,
+                  organization: cert.organization,
+                  purpose: cert.purpose,
+                  issued: cert.issued,
+                  expiry: cert.expiry,
+                  signatureBytes: cert.signatureBytes,
+                  createdBy: cert.createdBy,
+                  fromListPage: true, // <-- Pass this
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
