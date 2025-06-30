@@ -7,7 +7,7 @@ import '../../services/certificate_service.dart';
 class CertificateCreatePage extends StatefulWidget {
   final Function(String, String, String, DateTime, DateTime, Uint8List)
   onDataSaved;
-  final String username; // Add username parameter
+  final String username;
 
   const CertificateCreatePage({
     super.key,
@@ -37,106 +37,90 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
       lastDate: DateTime(2030),
     );
     if (picked != null) {
-      setState(() => isIssued ? issued = picked : expiry = picked);
+      setState(() {
+        if (isIssued) {
+          issued = picked;
+        } else {
+          expiry = picked;
+        }
+      });
     }
   }
 
   Future<void> submit() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isSubmitting = true;
-      });
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isSubmitting = true);
 
-      try {
-        // Navigate to SignaturePage to get signature bytes
-        final signatureBytes = await Navigator.push<Uint8List>(
-          context,
-          MaterialPageRoute(builder: (context) => const SignaturePage()),
+    try {
+      final signatureBytes = await Navigator.push<Uint8List>(
+        context,
+        MaterialPageRoute(builder: (_) => const SignaturePage()),
+      );
+      if (signatureBytes == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Signature not captured.")),
         );
+        setState(() => _isSubmitting = false);
+        return;
+      }
 
-        if (signatureBytes != null) {
-          // Navigate to CertificatePreviewPage with all details and wait for confirmation
-          final result = await Navigator.push<bool>(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (context) => CertificatePreviewPage(
-                    recipientName: nameController.text,
-                    organization: orgController.text,
-                    purpose: purposeController.text,
-                    issued: issued,
-                    expiry: expiry,
-                    signatureBytes: signatureBytes,
-                    createdBy: widget.username,
-                  ),
-            ),
-          );
-
-          if (result == true) {
-            // Save certificate using the service (status will be 'pending')
-            await _certificateService.createCertificate(
-              recipientName: nameController.text,
-              organization: orgController.text,
-              purpose: purposeController.text,
-              issued: issued,
-              expiry: expiry,
-              signatureBytes: signatureBytes,
-              createdBy: widget.username,
-            );
-
-            // Call onDataSaved callback if user confirmed
-            widget.onDataSaved(
-              nameController.text,
-              orgController.text,
-              purposeController.text,
-              issued,
-              expiry,
-              signatureBytes,
-            );
-
-            // Show success message
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Certificate created successfully and sent for approval!',
-                  ),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            }
-
-            // Close this page
-            if (mounted) {
-              Navigator.pop(context);
-            }
-          }
-        } else {
-          // User didn't provide signature or canceled
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Signature not captured, try again"),
+      final confirmed = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => CertificatePreviewPage(
+                recipientName: nameController.text,
+                organization: orgController.text,
+                purpose: purposeController.text,
+                issued: issued,
+                expiry: expiry,
+                signatureBytes: signatureBytes,
+                createdBy: widget.username,
               ),
-            );
-          }
-        }
-      } catch (e) {
+        ),
+      );
+
+      if (confirmed == true) {
+        await _certificateService.createCertificate(
+          recipientName: nameController.text,
+          organization: orgController.text,
+          purpose: purposeController.text,
+          issued: issued,
+          expiry: expiry,
+          signatureBytes: signatureBytes,
+          createdBy: widget.username,
+        );
+        widget.onDataSaved(
+          nameController.text,
+          orgController.text,
+          purposeController.text,
+          issued,
+          expiry,
+          signatureBytes,
+        );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error creating certificate: $e'),
-              backgroundColor: Colors.red,
+            const SnackBar(
+              content: Text(
+                'Certificate created successfully and sent for approval!',
+              ),
+              backgroundColor: Colors.green,
             ),
           );
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isSubmitting = false;
-          });
+          Navigator.pop(context);
         }
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error creating certificate: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -151,7 +135,14 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Certificate")),
+      // match StatusPage top section background
+      backgroundColor: Colors.grey.shade100,
+      appBar: AppBar(
+        title: const Text("Create Certificate"),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 1,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -159,63 +150,58 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
           child: ListView(
             children: [
               Text(
-                "Enter Certificate Info",
+                "Enter Certificate Information",
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: nameController,
                 decoration: const InputDecoration(labelText: "Recipient Name"),
-                validator: (val) => val!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Required" : null,
               ),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: orgController,
                 decoration: const InputDecoration(labelText: "Organization"),
-                validator: (val) => val!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Required" : null,
               ),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: purposeController,
                 decoration: const InputDecoration(labelText: "Purpose"),
-                validator: (val) => val!.isEmpty ? "Required" : null,
+                validator: (v) => v!.isEmpty ? "Required" : null,
               ),
+              const SizedBox(height: 20),
               ListTile(
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Issued Date"),
-                    Text(
-                      "${issued.toLocal()}".split(' ')[0],
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                tileColor: Colors.white,
+                title: const Text("Issued Date"),
+                subtitle: Text(
+                  "${issued.toLocal()}".split(' ')[0],
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => pickDate(true),
               ),
-
+              const SizedBox(height: 8),
               ListTile(
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Expiry Date"),
-                    Text(
-                      "${expiry.toLocal()}".split(' ')[0],
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                tileColor: Colors.white,
+                title: const Text("Expiry Date"),
+                subtitle: Text(
+                  "${expiry.toLocal()}".split(' ')[0],
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => pickDate(false),
               ),
-
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[400],
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 onPressed: _isSubmitting ? null : submit,
                 child:
                     _isSubmitting
@@ -225,13 +211,25 @@ class _CertificateCreatePageState extends State<CertificateCreatePage> {
                             SizedBox(
                               width: 16,
                               height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             ),
                             SizedBox(width: 8),
-                            Text("Processing..."),
+                            Text(
+                              "Processing...",
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ],
                         )
-                        : const Text("Next: Add Signature"),
+                        : const Text(
+                          "Next: Add Signature",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
               ),
             ],
           ),

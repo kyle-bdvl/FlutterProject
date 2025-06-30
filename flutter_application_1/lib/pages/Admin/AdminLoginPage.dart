@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/widgets/my_button.dart';
 import 'package:flutter_application_1/widgets/my_textfiled.dart';
-import 'package:flutter_application_1/widgets/square_tile.dart';
-import 'AdminRegisterPage.dart';
 import 'AdminDashboard.dart';
 
 class AdminLoginPage extends StatefulWidget {
@@ -75,10 +73,10 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        title: const Text('Admin Login', style: TextStyle(color: Colors.blue)),
+        title: const Text('Admin Login', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.blue),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SafeArea(
         child: Center(
@@ -93,21 +91,30 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                   style: TextStyle(color: Colors.grey[700], fontSize: 16),
                 ),
                 const SizedBox(height: 25),
-                MyTextField(
-                  controller: upmIdController,
-                  hintText: 'UPM-ID',
-                  obscureText: false,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: MyTextField(
+                    controller: upmIdController,
+                    hintText: 'UPM-ID',
+                    obscureText: false,
+                  ),
                 ),
                 const SizedBox(height: 10),
-                MyTextField(
-                  controller: passwordController,
-                  hintText: 'Password',
-                  obscureText: obscurePassword,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: MyTextField(
+                    controller: passwordController,
+                    hintText: 'Password',
+                    obscureText: obscurePassword,
+                  ),
                 ),
                 const SizedBox(height: 25),
-                isLoading
-                    ? const CircularProgressIndicator()
-                    : MyButton(onTap: signAdminIn, text: 'Sign In'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: isLoading
+                      ? const CircularProgressIndicator()
+                      : MyButton(onTap: signAdminIn, text: 'Sign In'),
+                ),
                 const SizedBox(height: 25),
                 // Demo credentials info
                 Container(
@@ -142,62 +149,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 25),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(thickness: 0.5, color: Colors.grey[400]),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Or continue with',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(thickness: 0.5, color: Colors.grey[400]),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    SquareTile(imagePath: 'lib/images/google.png'),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Don\'t have an admin account?',
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AdminRegisterPage(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'Register here',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
                 const SizedBox(height: 25),
               ],

@@ -9,7 +9,6 @@ import 'pages/Register/verify_otp_page.dart';
 import 'pages/Register/reset_password_page.dart';
 import 'pages/Admin/AdminDashboard.dart';
 import 'pages/Admin/AdminLoginPage.dart';
-import 'pages/Admin/AdminRegisterPage.dart';
 
 // Constants
 import 'package:flutter_application_1/constants/route_names.dart';
@@ -47,7 +46,6 @@ class MyApp extends StatelessWidget {
         routeResetPassword: (context) => const ResetPasswordPage(),
         routeAdminDashboard: (context) => const AdminDashboard(),
         routeAdminLogin: (context) => const AdminLoginPage(),
-        routeAdminRegister: (context) => const AdminRegisterPage(),
       },
     );
   }
