@@ -13,25 +13,21 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final usernameController         = TextEditingController();
-  final emailOrUpmIdController     = TextEditingController();
-  final passwordController         = TextEditingController();
-  final confirmPasswordController  = TextEditingController();
+  final usernameController = TextEditingController();
+  final emailOrUpmIdController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   String userType = 'Recipient';
-  final List<String> userTypes = [
-    'Certificate Authority (CA)',
-    'Recipient',
-  ];
+  final List<String> userTypes = ['Certificate Authority (CA)', 'Recipient'];
   bool isLoading = false;
 
   Future<void> registerUser() async {
-    final username       = usernameController.text.trim();
-    final emailOrUpmId   = emailOrUpmIdController.text.trim();
-    final password       = passwordController.text;
-    final confirmPass    = confirmPasswordController.text;
+    final username = usernameController.text.trim();
+    final emailOrUpmId = emailOrUpmIdController.text.trim();
+    final password = passwordController.text;
+    final confirmPass = confirmPasswordController.text;
 
-    if ([username, emailOrUpmId, password, confirmPass]
-        .any((e) => e.isEmpty)) {
+    if ([username, emailOrUpmId, password, confirmPass].any((e) => e.isEmpty)) {
       showMessage('Please fill in all fields');
       return;
     }
@@ -39,8 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
     // UPM-ID → student email fallback
     String email;
     String upmId = '';
-    if (RegExp(r'^[a-zA-Z0-9.]+$')
-        .hasMatch(emailOrUpmId) &&
+    if (RegExp(r'^[a-zA-Z0-9.]+$').hasMatch(emailOrUpmId) &&
         !emailOrUpmId.contains('@')) {
       upmId = emailOrUpmId;
       email = '$upmId@student.upm.edu.my';
@@ -68,8 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     setState(() => isLoading = true);
     try {
-      final cred = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
+      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -77,13 +71,13 @@ class _RegisterPageState extends State<RegisterPage> {
           .collection('users')
           .doc(cred.user!.uid)
           .set({
-        'username': username,
-        'upmId': upmId,
-        'email': email,
-        'originalInput': emailOrUpmId,
-        'userType': userType,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+            'username': username,
+            'upmId': upmId,
+            'email': email,
+            'originalInput': emailOrUpmId,
+            'userType': userType,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
 
       showMessage('Registered successfully as $userType');
       Navigator.pop(context);
@@ -99,8 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void showMessage(String msg) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -128,154 +121,150 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                const Icon(Icons.person_add, size: 80),
-                const SizedBox(height: 20),
-                Text(
-                  'Create your account',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 16,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16.0,
+              ), // Add vertical padding
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 20),
+                  const Icon(Icons.person_add, size: 80),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Create your account',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey[700], fontSize: 16),
                   ),
-                ),
-                const SizedBox(height: 25),
+                  const SizedBox(height: 25),
 
-                // — Username
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: MyTextField(
-                    controller: usernameController,
-                    hintText: 'Username',
-                    obscureText: false,
+                  // — Username
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: MyTextField(
+                      controller: usernameController,
+                      hintText: 'Username',
+                      obscureText: false,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
-                // — UPM-ID or Email
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: MyTextField(
-                    controller: emailOrUpmIdController,
-                    hintText: 'UPM-ID or Email',
-                    obscureText: false,
-                    onChanged: (v) {
-                      final t = v.trim();
-                      if (v != t) {
-                        emailOrUpmIdController.value =
-                            emailOrUpmIdController.value.copyWith(
-                              text: t,
-                              selection:
-                              TextSelection.collapsed(offset: t.length),
-                            );
-                      }
-                    },
+                  // — UPM-ID or Email
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: MyTextField(
+                      controller: emailOrUpmIdController,
+                      hintText: 'UPM-ID or Email',
+                      obscureText: false,
+                      onChanged: (v) {
+                        final t = v.trim();
+                        if (v != t) {
+                          emailOrUpmIdController.value = emailOrUpmIdController
+                              .value
+                              .copyWith(
+                                text: t,
+                                selection: TextSelection.collapsed(
+                                  offset: t.length,
+                                ),
+                              );
+                        }
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
-                // — Password
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: MyTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    obscureText: true,
+                  // — Password
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: MyTextField(
+                      controller: passwordController,
+                      hintText: 'Password',
+                      obscureText: true,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
-                // — Confirm Password
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: MyTextField(
-                    controller: confirmPasswordController,
-                    hintText: 'Confirm Password',
-                    obscureText: true,
+                  // — Confirm Password
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: MyTextField(
+                      controller: confirmPasswordController,
+                      hintText: 'Confirm Password',
+                      obscureText: true,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
+                  const SizedBox(height: 10),
 
-                // — User Type dropdown
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50),
-                  child: SizedBox(
-                    height: 60,
+                  // — User Type dropdown
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                    ), // Match text fields
                     child: DropdownButtonFormField<String>(
                       value: userType,
+                      isDense: true,
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor:
-                        const Color.fromARGB(255, 183, 206, 255),
+                        fillColor: const Color.fromARGB(255, 183, 206, 255),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding:
-                        const EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 18,
+                          vertical: 10, // Reduce vertical padding
                         ),
                       ),
-                      dropdownColor:
-                      const Color.fromARGB(255, 183, 206, 255),
-                      items: userTypes
-                          .map(
-                            (t) => DropdownMenuItem(
-                          value: t,
-                          child: Text(t),
-                        ),
-                      )
-                          .toList(),
-                      onChanged: (v) =>
-                          setState(() => userType = v!),
+                      dropdownColor: const Color.fromARGB(255, 183, 206, 255),
+                      items:
+                          userTypes
+                              .map(
+                                (t) =>
+                                    DropdownMenuItem(value: t, child: Text(t)),
+                              )
+                              .toList(),
+                      onChanged: (v) => setState(() => userType = v!),
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 25),
+                  const SizedBox(height: 25),
 
-                // — Register button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: isLoading
-                      ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                      : MyButton(
-                    onTap: registerUser,
-                    text: 'Register',
+                  // — Register button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child:
+                        isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : MyButton(onTap: registerUser, text: 'Register'),
                   ),
-                ),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // — Already have an account?
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Already have an account?',
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
+                  // — Already have an account?
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Already have an account?',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Text(
+                          'Login',
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
 
-                const SizedBox(height: 20),
-              ],
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
