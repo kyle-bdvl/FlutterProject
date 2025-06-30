@@ -5,7 +5,6 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import '../../services/certificate_service.dart';
-import 'share_certificate_page.dart';
 
 class CertificatePreviewPage extends StatefulWidget {
   final String recipientName;
@@ -15,7 +14,7 @@ class CertificatePreviewPage extends StatefulWidget {
   final DateTime expiry;
   final Uint8List signatureBytes;
   final String createdBy;
-  final bool fromListPage; // <-- Add this
+  final bool fromListPage;
 
   const CertificatePreviewPage({
     super.key,
@@ -26,7 +25,7 @@ class CertificatePreviewPage extends StatefulWidget {
     required this.expiry,
     required this.signatureBytes,
     required this.createdBy,
-    this.fromListPage = false, // <-- Default to false
+    this.fromListPage = false,
   });
 
   @override
@@ -43,7 +42,7 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
     final pdf = pw.Document();
     final ttf = pw.Font.ttf(await rootBundle.load('assets/fonts/times.ttf'));
     final signatureImage = pw.MemoryImage(widget.signatureBytes);
-    final borderColor = PdfColor.fromHex("#D4AF37"); // gold
+    final borderColor = PdfColor.fromHex("#D4AF37");
 
     pdf.addPage(
       pw.Page(
@@ -79,10 +78,7 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
                   ),
                 ),
                 pw.SizedBox(height: 32),
-                pw.Text(
-                  'This is to certify that',
-                  style: pw.TextStyle(fontSize: 18),
-                ),
+                pw.Text('This is to certify that', style: pw.TextStyle(fontSize: 18)),
                 pw.SizedBox(height: 12),
                 pw.Text(
                   widget.recipientName,
@@ -94,10 +90,7 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
                   ),
                 ),
                 pw.SizedBox(height: 12),
-                pw.Text(
-                  'has successfully completed',
-                  style: pw.TextStyle(font: ttf, fontSize: 18),
-                ),
+                pw.Text('has successfully completed', style: pw.TextStyle(font: ttf, fontSize: 18)),
                 pw.SizedBox(height: 8),
                 pw.Text(
                   widget.purpose,
@@ -109,48 +102,29 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
                   ),
                   textAlign: pw.TextAlign.center,
                 ),
-                pw.SizedBox(height: 8),
                 pw.SizedBox(height: 12),
-                pw.Text(
-                  'at ${widget.organization}',
-                  style: pw.TextStyle(font: ttf, fontSize: 18),
-                ),
+                pw.Text('at ${widget.organization}', style: pw.TextStyle(font: ttf, fontSize: 18)),
                 pw.Spacer(),
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
                     pw.Column(
                       children: [
-                        pw.Text(
-                          'Issued on',
-                          style: pw.TextStyle(font: ttf, fontSize: 14),
-                        ),
-                        pw.Text(
-                          formatDate(widget.issued),
-                          style: pw.TextStyle(font: ttf, fontSize: 14),
-                        ),
+                        pw.Text('Issued on', style: pw.TextStyle(font: ttf, fontSize: 14)),
+                        pw.Text(formatDate(widget.issued), style: pw.TextStyle(font: ttf, fontSize: 14)),
                       ],
                     ),
                     pw.Column(
                       children: [
-                        pw.Text(
-                          'Expires on',
-                          style: pw.TextStyle(font: ttf, fontSize: 14),
-                        ),
-                        pw.Text(
-                          formatDate(widget.expiry),
-                          style: pw.TextStyle(font: ttf, fontSize: 14),
-                        ),
+                        pw.Text('Expires on', style: pw.TextStyle(font: ttf, fontSize: 14)),
+                        pw.Text(formatDate(widget.expiry), style: pw.TextStyle(font: ttf, fontSize: 14)),
                       ],
                     ),
                   ],
                 ),
                 pw.SizedBox(height: 24),
                 pw.Container(height: 100, child: pw.Image(signatureImage)),
-                pw.Text(
-                  'Authorized Signature',
-                  style: pw.TextStyle(font: ttf, fontSize: 14),
-                ),
+                pw.Text('Authorized Signature', style: pw.TextStyle(font: ttf, fontSize: 14)),
                 pw.SizedBox(height: 24),
                 pw.Divider(thickness: 1),
                 pw.Text(
@@ -193,22 +167,8 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
           backgroundColor: Colors.green,
         ),
       );
+      // Removed navigation to ShareCertificatePage
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => ShareCertificatePage(
-                recipientName: widget.recipientName,
-                organization: widget.organization,
-                purpose: widget.purpose,
-                issued: widget.issued,
-                expiry: widget.expiry,
-                signatureBytes: widget.signatureBytes,
-                createdBy: widget.createdBy,
-              ),
-        ),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -229,7 +189,6 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
       appBar: AppBar(title: const Text("Certificate Preview")),
       body: Column(
         children: [
-          // PDF Preview
           Expanded(
             child: PdfPreview(
               build: (format) => _generatePdf(format),
@@ -237,21 +196,19 @@ class _CertificatePreviewPageState extends State<CertificatePreviewPage> {
               allowSharing: true,
             ),
           ),
-          // Bottom save button
           Container(
             padding: const EdgeInsets.all(16),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _isSaving ? null : _saveCertificate,
-                icon:
-                    _isSaving
-                        ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : const Icon(Icons.save),
+                icon: _isSaving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.save),
                 label: Text(
                   _isSaving ? 'Saving Certificate...' : 'Save Certificate',
                 ),
