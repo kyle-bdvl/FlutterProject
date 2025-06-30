@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_stripe/flutter_stripe.dart'; // <--- Stripe import
 
 // Pages
 import 'pages/Register/login_page.dart';
@@ -18,6 +19,11 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Stripe BEFORE runApp
+  Stripe.publishableKey = 'pk_test_51Rfi1bCev5PZxY3VHEJktJa7uUbTrhsm8ILMPpBydePlIImDwfnIMZlu6YMJq5qIXHk2P0sCHax1Yx5QcG67kWgg00EBqmnlfG'; // <-- Put your Stripe publishable key here
+  // Stripe.merchantIdentifier = 'merchant.com.your.id'; // For Apple Pay, if ever needed
+  // Stripe.urlScheme = 'flutterstripe'; // For handling redirects (if ever needed)
 
   // Initialize Firebase with platform-specific options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

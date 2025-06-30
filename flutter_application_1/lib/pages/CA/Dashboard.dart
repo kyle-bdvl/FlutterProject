@@ -114,20 +114,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Recipient Dashboard label
                     const SizedBox(height: 12),
-                    Center(
-                      child: Text(
-                        'Recipient Dashboard',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
 
                     // Greeting card
                     Card(

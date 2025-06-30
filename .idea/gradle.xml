@@ -31,6 +31,8 @@
             <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler_android-12.1.0/android" />
             <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.dev/printing-5.14.2/android" />
             <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.dev/share_plus-7.2.2/android" />
+            <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.dev/stripe_android-9.6.0+2/android" />
+            <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_android-6.3.16/android" />
             <option value="$USER_HOME$/OneDrive/Documents/FlutterDev/flutter/packages/flutter_tools/gradle" />
             <option value="$PROJECT_DIR$/flutter_application_1/android" />
             <option value="$PROJECT_DIR$/flutter_application_1/android/app" />
