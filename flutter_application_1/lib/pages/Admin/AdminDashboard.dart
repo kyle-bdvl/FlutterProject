@@ -107,6 +107,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       tooltip: 'Approve',
                       onPressed: () async {
                         await CertificateService().approveCertificate(cert.id);
+
+                        setState(() {
+                          adminLogs.insert(
+                            0,
+                            AdminLog(
+                              id:
+                                  DateTime.now().millisecondsSinceEpoch
+                                      .toString(),
+                              action: 'Approved',
+                              documentId: cert.id,
+                              documentName: cert.recipientName,
+                              adminName:
+                                  'Admin User', // Replace with real admin name if available
+                              timestamp: DateTime.now(),
+                            ),
+                          );
+                        });
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Certificate approved!'),
@@ -120,6 +138,26 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       tooltip: 'Reject',
                       onPressed: () async {
                         await CertificateService().rejectCertificate(cert.id);
+
+                        setState(() {
+                          adminLogs.insert(
+                            0,
+                            AdminLog(
+                              id:
+                                  DateTime.now().millisecondsSinceEpoch
+                                      .toString(),
+                              action: 'Rejected',
+                              documentId: cert.id,
+                              documentName: cert.recipientName,
+                              adminName:
+                                  'Admin User', // Replace with real admin name if available
+                              timestamp: DateTime.now(),
+                              reason:
+                                  'Rejected by Admin', // Optional, customize reason
+                            ),
+                          );
+                        });
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Certificate rejected!'),
